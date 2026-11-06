@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小妖小窝 · 后台上传</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0b0d15; color:#e0e0e0;
+    font-family:system-ui,-apple-system,'PingFang SC',sans-serif;
+    min-height:100vh; display:flex; justify-content:center;
+    padding:40px 20px;
+  }
+  .box { width:100%; max-width:720px; }
+  .head { margin-bottom:32px; padding-bottom:22px; border-bottom:1px solid #232a3d; }
+  .head h1 { font-size:1.35rem; color:#fff; letter-spacing:1px; }
+  .head .sub { margin-top:8px; font-size:.78rem; color:#6a7a99; letter-spacing:1px; line-height:1.7; }
+  .head .warn {
+    display:inline-block; margin-top:10px; padding:4px 12px; border-radius:20px;
+    background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.25);
+    color:#fca5a5; font-size:.7rem; letter-spacing:1px;
+  }
+  .config-block, .upload-block {
+    padding:22px; border-radius:14px;
+    background:#0f131c; border:1px solid #232a3d;
+    margin-bottom:28px;
+  }
+  .cfg-title, .up-title {
+    font-size:.75rem; color:#9bbaff; letter-spacing:2px;
+    text-transform:uppercase; margin-bottom:18px;
+  }
+  .field { margin-bottom:18px; }
+  .field:last-child { margin-bottom:0; }
+  label { display:block; font-size:.78rem; color:#8899bb; margin-bottom:8px; letter-spacing:1px; }
+  label .hint-tag { font-size:.68rem; color:#5a6a88; margin-left:6px; }
+  input[type="text"], input[type="password"], input[type="file"] {
+    width:100%; padding:12px 14px; border-radius:9px;
+    background:#141824; border:1px solid #232a3d;
+    color:#e0e0e0; font-size:.88rem; outline:none;
+    transition:border-color .2s;
+  }
+  input:focus { border-color:#4a7aff; }
+  input[type="file"] { padding:10px; color:#8899bb; }
+  button {
+    width:100%; padding:14px; border:none; border-radius:9px;
+    background:linear-gradient(135deg,#4a7aff,#a855f7);
+    color:#fff; font-size:.9rem; font-weight:600;
+    cursor:pointer; letter-spacing:1px;
+    transition:opacity .2s, transform .15s;
+    font-family:inherit;
+  }
+  button:hover { opacity:.9; }
+  button:active { transform:scale(.98); }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  button.secondary { background:#232a3d; }
+  .status {
+    margin-top:14px; padding:12px 14px; border-radius:9px;
+    font-size:.83rem; display:none; line-height:1.7;
+  }
+  .status.ok { display:block; background:rgba(52,211,153,.1); color:#6ee7b7; border:1px solid rgba(52,211,153,.25); }
+  .status.err { display:block; background:rgba(248,113,113,.1); color:#fca5a5; border:1px solid rgba(248,113,113,.25); }
+  .status.load { display:block; background:rgba(74,122,255,.1); color:#9bbaff; border:1px solid rgba(74,122,255,.25); }
+  .progress { margin-top:12px; height:6px; background:#1a1f2e; border-radius:3px; overflow:hidden; display:none; }
+  .progress .bar { height:100%; width:0%; background:linear-gradient(90deg,#4a7aff,#a855f7); transition:width .3s; }
+  .list-block { margin-top:8px; }
+  .list-block .lb-title { font-size:.75rem; color:#6a7a99; letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; }
+  .item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px; background:#141824;
+    border:1px solid #232a3d; border-radius:10px;
+    margin-bottom:10px; gap:12px;
+  }
+  .item .item-info { flex:1; min-width:0; }
+  .item .item-name { font-size:.86rem; color:#c0d0ee; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .item .item-loc { margin-top:4px; font-size:.68rem; color:#5a6a88; letter-spacing:1px; }
+  .item .del {
+    background:transparent; border:1px solid #4a1f2e; color:#fca5a5;
+    width:auto; padding:6px 12px; font-size:.72rem; border-radius:8px; flex-shrink:0;
+  }
+  .item .del:hover { background:rgba(248,113,113,.1); }
+  .empty-list { padding:30px; text-align:center; color:#3a4a66; font-size:.8rem; background:#0d111a; border:1px dashed #232a3d; border-radius:10px; }
+  .help-box {
+    margin-top:26px; padding:18px 20px; border-radius:12px;
+    background:rgba(255,105,180,.05); border:1px solid rgba(255,105,180,.15);
+    font-size:.76rem; color:#8899bb; line-height:1.9;
+  }
+  .help-box strong { color:#ffb0d0; }
+  .help-box code { background:rgba(160,240,255,.08); color:#a0f0ff; padding:1px 6px; border-radius:4px; font-size:.72rem; }
+  .img-preview { margin-top:8px; border-radius:8px; overflow:hidden; display:none; max-height:140px; }
+  .img-preview img { width:100%; height:auto; display:block; max-height:140px; object-fit:cover; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="head">
+    <h1>🍍 小妖小窝 · 后台</h1>
+    <p class="sub">本文件仅在你自己的电脑上运行，用来上传/管理视频和图片。<br>不要上传到 GitHub，不要发给别人。</p>
+    <span class="warn">⚠️ 含 Secret Key，仅本地使用</span>
+  </div>
+
+  <div class="config-block">
+    <div class="cfg-title">Supabase 配置</div>
+    <div class="field">
+      <label>Project URL</label>
+      <input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co">
+    </div>
+    <div class="field">
+      <label>Secret Key <span class="hint-tag">service_role / sb_secret_...</span></label>
+      <input type="password" id="sbKey" placeholder="粘贴 Secret Key">
+    </div>
+    <button id="saveConfig" class="secondary">保存配置</button>
+  </div>
+
+  <div class="upload-block">
+    <div class="up-title">上传新视频</div>
+    <div class="field">
+      <label>视频标题 <span class="hint-tag">显示在：首页精选卡片 / 作品墙列表 / 详情页标题</span></label>
+      <input type="text" id="videoTitle" placeholder="例如：新年祝福 · 福运加马">
+    </div>
+    <div class="field">
+      <label>视频文件 <span class="hint-tag">mp4，建议 50MB 以内</span></label>
+      <input type="file" id="videoFile" accept="video/mp4,video/*">
+    </div>
+    <button id="uploadBtn">上传视频</button>
+    <div class="progress" id="progress"><div class="bar" id="progressBar"></div></div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="upload-block">
+    <div class="up-title">上传站点图片</div>
+    <p style="font-size:.75rem;color:#5a6a88;margin-bottom:18px;line-height:1.8;">
+      每个位置上传后，主页面对应区域自动替换为你的图片。<br>
+      没上传的位置，会使用默认渐变背景。
+    </p>
+
+    <div class="field">
+      <label>头像 <span class="hint-tag">显示在：欢迎页大圆头像 · 首页导航小圆标</span></label>
+      <input type="file" id="img_avatar" accept="image/*" data-slot="avatar">
+      <div class="img-preview" id="preview_avatar"></div>
+    </div>
+    <div class="field">
+      <label>全局背景 <span class="hint-tag">显示在：所有页面共用的主题背景层</span></label>
+      <input type="file" id="img_global_bg" accept="image/*" data-slot="global_bg">
+      <div class="img-preview" id="preview_global_bg"></div>
+    </div>
+    <div class="field">
+      <label>首页背景 <span class="hint-tag">显示在：首页“小妖的小窝”区域顶部</span></label>
+      <input type="file" id="img_home_bg" accept="image/*" data-slot="home_bg">
+      <div class="img-preview" id="preview_home_bg"></div>
+    </div>
+    <div class="field">
+      <label>作品墙背景 <span class="hint-tag">显示在：全部作品页顶部</span></label>
+      <input type="file" id="img_works_bg" accept="image/*" data-slot="works_bg">
+      <div class="img-preview" id="preview_works_bg"></div>
+    </div>
+    <div class="field">
+      <label>关于她背景 <span class="hint-tag">显示在：关于她页面顶部</span></label>
+      <input type="file" id="img_about_bg" accept="image/*" data-slot="about_bg">
+      <div class="img-preview" id="preview_about_bg"></div>
+    </div>
+    <div class="field">
+      <label>学舞背景 <span class="hint-tag">显示在：学舞经历页面顶部</span></label>
+      <input type="file" id="img_dance_bg" accept="image/*" data-slot="dance_bg">
+      <div class="img-preview" id="preview_dance_bg"></div>
+    </div>
+    <div class="field">
+      <label>关注页背景 <span class="hint-tag">显示在：关注她页面顶部</span></label>
+      <input type="file" id="img_contact_bg" accept="image/*" data-slot="contact_bg">
+      <div class="img-preview" id="preview_contact_bg"></div>
+    </div>
+    <div class="status" id="imgStatus"></div>
+  </div>
+
+  <div class="list-block">
+    <div class="lb-title">已上传视频</div>
+    <div id="videoList"><div class="empty-list">加载中...</div></div>
+  </div>
+
+  <div class="help-box">
+    <strong>显示位置说明：</strong><br>
+    视频上传后会自动出现在：① 首页「精选作品」网格（最新 6 个）② 「全部作品」页竖向列表 ③ 点击后进入「作品详情」页播放。<br><br>
+    <strong>图片显示位置：</strong><br>
+    每张图上传时，上方都标注了“显示在：XXX”，对应主页面具体区域。没上传的位置自动使用默认渐变背景。<br><br>
+    <strong>配置说明：</strong><br>
+    URL 和 Secret Key 只保存在你当前浏览器的 localStorage 里，不会上传到任何服务器。换浏览器或清缓存后需要重新填。<br><br>
+    <strong>文件名清洗：</strong><br>
+    上传时会自动把文件名里的中文、空格、特殊字符替换为下划线，只保留字母、数字、点、下划线、连字符，避免 <code>Invalid path</code> 错误。
+  </div>
+</div>
+
+<script>
+const { createClient } = supabase;
+let db = null;
+
+function safeName(str) {
+  return String(str).replace(/[^a-zA-Z0-9._-]/g, '_');
+}
+function safeExt(file, type) {
+  let ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (type === 'video') {
+    if (!['mp4','mov','webm','ogg','m4v'].includes(ext)) ext = 'mp4';
+  } else {
+    if (!['jpg','jpeg','png','webp','gif','bmp'].includes(ext)) ext = 'jpg';
+  }
+  return ext;
+}
+
+function loadConfig() {
+  const url = localStorage.getItem('sb_url') || '';
+  const key = localStorage.getItem('sb_key') || '';
+  document.getElementById('sbUrl').value = url;
+  document.getElementById('sbKey').value = key;
+  if (url && key) initClient(url, key);
+}
+function initClient(url, key) {
+  try { db = createClient(url, key); return true; }
+  catch (e) { showStatus('err', '初始化失败：' + e.message); return false; }
+}
+function showStatus(type, msg) {
+  const el = document.getElementById('status');
+  el.className = 'status ' + type;
+  el.textContent = msg;
+}
+function showImgStatus(type, msg) {
+  const el = document.getElementById('imgStatus');
+  el.className = 'status ' + type;
+  el.textContent = msg;
+}
+
+document.getElementById('saveConfig').onclick = () => {
+  const url = document.getElementById('sbUrl').value.trim();
+  const key = document.getElementById('sbKey').value.trim();
+  if (!url || !key) return showStatus('err', '请填写 URL 和 Secret Key');
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  if (initClient(url, key)) {
+    showStatus('ok', '配置已保存，可以上传了');
+    loadList();
+    loadImagePreviews();
+  }
+};
+
+document.getElementById('uploadBtn').onclick = async () => {
+  if (!db) return showStatus('err', '请先保存配置');
+  const title = document.getElementById('videoTitle').value.trim() || '未命名视频';
+  const fileInput = document.getElementById('videoFile');
+  const file = fileInput.files[0];
+  if (!file) return showStatus('err', '请选择视频文件');
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+  const progress = document.getElementById('progress');
+  const bar = document.getElementById('progressBar');
+  progress.style.display = 'block';
+  bar.style.width = '10%';
+  showStatus('load', '正在上传视频文件...');
+
+  try {
+    const ext = safeExt(file, 'video');
+    const fileName = safeName(`${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`);
+    console.log('上传文件名:', fileName);
+
+    bar.style.width = '30%';
+    const { error: uploadErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
+    if (uploadErr) throw uploadErr;
+    bar.style.width = '70%';
+    const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
+    const publicUrl = urlData.publicUrl;
+    const { error: dbErr } = await db.from('videos').insert({ title, url: publicUrl });
+    if (dbErr) throw dbErr;
+    bar.style.width = '100%';
+    showStatus('ok', '上传成功！主页面刷新即可看到。');
+    document.getElementById('videoTitle').value = '';
+    fileInput.value = '';
+    loadList();
+  } catch (e) {
+    showStatus('err', '上传失败：' + (e.message || JSON.stringify(e)));
+    bar.style.width = '0%';
+  } finally {
+    btn.disabled = false;
+    setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 1600);
+  }
+};
+
+async function loadList() {
+  if (!db) return;
+  const listEl = document.getElementById('videoList');
+  listEl.innerHTML = '<div class="empty-list">加载中...</div>';
+  try {
+    const { data, error } = await db.from('videos').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      listEl.innerHTML = '<div class="empty-list">还没有视频，上传第一个吧</div>';
+      return;
+    }
+    listEl.innerHTML = data.map(v => `
+      <div class="item">
+        <div class="item-info">
+          <div class="item-name">${esc(v.title || '未命名视频')}</div>
+          <div class="item-loc">→ 显示于：首页精选 · 作品墙 · 详情页</div>
+        </div>
+        <button class="del" data-id="${v.id}" data-url="${escAttr(v.url)}">删除</button>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.del').forEach(btn => {
+      btn.addEventListener('click', () => delVideo(Number(btn.dataset.id), btn.dataset.url));
+    });
+  } catch (e) {
+    listEl.innerHTML = `<div class="empty-list" style="color:#fca5a5;">加载失败：${esc(e.message)}</div>`;
+  }
+}
+
+async function delVideo(id, url) {
+  if (!confirm('确定删除这个视频吗？会同时删掉云存储文件和数据库记录。')) return;
+  try {
+    const fileName = url.split('/').pop();
+    await db.storage.from('videos').remove([fileName]);
+    await db.from('videos').delete().eq('id', id);
+    loadList();
+  } catch (e) { alert('删除失败：' + e.message); }
+}
+
+document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
+  input.addEventListener('change', async () => {
+    if (!db) return showImgStatus('err', '请先保存配置');
+    const file = input.files[0];
+    if (!file) return;
+    const slot = input.dataset.slot;
+    const previewEl = document.getElementById('preview_' + slot);
+    showImgStatus('load', '正在上传图片...');
+
+    try {
+      const ext = safeExt(file, 'image');
+      const fileName = safeName(`img_${slot}_${Date.now()}.${ext}`);
+      console.log('上传图片文件名:', fileName);
+
+      const { error: upErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
+      if (upErr) throw upErr;
+      const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
+      const publicUrl = urlData.publicUrl;
+      await db.from('site_images').delete().eq('slot', slot);
+      const { error: dbErr } = await db.from('site_images').insert({ slot, url: publicUrl });
+      if (dbErr) throw dbErr;
+      if (previewEl) {
+        previewEl.innerHTML = `<img src="${publicUrl}" alt="${slot}">`;
+        previewEl.style.display = 'block';
+      }
+      showImgStatus('ok', `「${slot}」上传成功，主页面刷新即可看到`);
+    } catch (e) {
+      showImgStatus('err', '上传失败：' + (e.message || JSON.stringify(e)));
+    }
+  });
+});
+
+async function loadImagePreviews() {
+  if (!db) return;
+  try {
+    const { data } = await db.from('site_images').select('*');
+    (data || []).forEach(row => {
+      const previewEl = document.getElementById('preview_' + row.slot);
+      if (previewEl) {
+        previewEl.innerHTML = `<img src="${row.url}" alt="${row.slot}">`;
+        previewEl.style.display = 'block';
+      }
+    });
+  } catch (e) {}
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+loadConfig();
+</script>
+</body>
+</html>

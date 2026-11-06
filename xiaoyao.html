@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>菠萝小妖💃 · 帅是常态，甜是彩蛋</title>
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background:#06080e; color:#fff;
+    font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+    overflow-x:hidden;
+  }
+  .theme-bg {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(168,85,247,.22) 0%, transparent 45%),
+      radial-gradient(circle at 80% 70%, rgba(236,72,153,.18) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(74,122,255,.12) 0%, transparent 60%),
+      linear-gradient(180deg,#06080e 0%,#0a0d16 40%,#080a12 100%);
+  }
+  .theme-bg::after {
+    content:'菠萝小妖';
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-size:clamp(8rem,22vw,18rem);
+    font-weight:900; letter-spacing:20px;
+    color:rgba(160,240,255,.025);
+    white-space:nowrap; pointer-events:none;
+    font-family:'Ma Shan Zheng', 'PingFang SC', cursive;
+  }
+  .theme-img-bg {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-size:cover; background-position:center;
+    opacity:0; transition:opacity .8s ease;
+  }
+  .theme-img-bg.show { opacity:1; }
+
+  .page {
+    position:fixed; inset:0; z-index:2;
+    display:none;
+    flex-direction:column;
+    overflow-y:auto; overflow-x:hidden;
+  }
+  .page.active { display:flex; z-index:3; }
+  .page::-webkit-scrollbar { width:6px; }
+  .page::-webkit-scrollbar-thumb { background:rgba(160,240,255,.15); border-radius:3px; }
+
+  .section { max-width:1200px; margin:0 auto; width:100%; padding:0 40px; position:relative; z-index:1; }
+  @media (max-width:768px) { .section { padding:0 20px; } }
+  .sec-label { font-size:.7rem; color:#5a6a88; letter-spacing:4px; text-transform:uppercase; margin-bottom:8px; }
+  .sec-title {
+    font-size:clamp(1.6rem,5vw,2.4rem); font-weight:800; letter-spacing:3px;
+    background:linear-gradient(135deg,#e0f0ff,#ff9ef0);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sec-desc { margin-top:10px; font-size:.85rem; color:#6a7a99; line-height:1.9; letter-spacing:.5px; }
+  .top-bar {
+    position:sticky; top:0; z-index:20;
+    padding:14px 24px;
+    display:flex; align-items:center; gap:10px;
+    background:rgba(6,8,14,.75); backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(255,255,255,.05);
+  }
+  .top-bar .tb-title { font-size:.95rem; color:#d0e0ff; font-weight:600; letter-spacing:1px; margin-left:6px; }
+  .nav-btn {
+    width:40px; height:40px; border-radius:50%;
+    border:1px solid rgba(160,240,255,.2);
+    background:rgba(255,255,255,.04);
+    color:#d0e0ff; font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex-shrink:0;
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1), background .3s;
+  }
+  .nav-btn:hover { transform:scale(1.1); background:rgba(160,240,255,.12); }
+  .home-btn {
+    padding:9px 18px; border-radius:40px;
+    font-size:.72rem; letter-spacing:2px;
+    background:rgba(160,240,255,.08);
+    border:1px solid rgba(160,240,255,.2);
+    color:#9bbaff; cursor:pointer; flex-shrink:0;
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1), background .3s, border-color .3s;
+    font-family:inherit;
+  }
+  .home-btn:hover { transform:translateY(-1px); background:rgba(160,240,255,.15); border-color:rgba(160,240,255,.4); color:#e0f0ff; }
+  .page-hero-bg {
+    position:absolute; top:0; left:0; right:0;
+    height:400px; pointer-events:none; z-index:0;
+    background-size:cover; background-position:center;
+    opacity:0; transition:opacity .8s ease;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 100%);
+    mask-image:linear-gradient(180deg,#000 0%,transparent 100%);
+  }
+  .page-hero-bg.show { opacity:.4; }
+  .avatar-big img, .dot-logo img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+
+  #page-welcome { align-items:center; justify-content:center; padding:32px 24px; }
+  .welcome-inner { text-align:center; max-width:680px; position:relative; z-index:1; }
+  .avatar-big {
+    width:150px; height:150px; border-radius:50%;
+    margin:0 auto 36px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:64px; font-weight:800; color:#a0f0ff;
+    background:linear-gradient(145deg,#1a1d2a,#0f1118);
+    border:1.5px solid rgba(160,240,255,.25);
+    box-shadow:0 32px 80px rgba(0,0,0,.7);
+    position:relative; letter-spacing:2px; overflow:hidden;
+    will-change:transform;
+  }
+  .avatar-big::after {
+    content:''; position:absolute; inset:-11px; border-radius:50%;
+    background:conic-gradient(from 0deg,#00ffff,#ff69b4,#a855f7,#00ffff);
+    opacity:.5; z-index:-1; filter:blur(18px);
+    animation:spin 7s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .w-name {
+    font-size:clamp(2.8rem,11vw,5rem); font-weight:800;
+    letter-spacing:8px; line-height:1.1;
+    background:linear-gradient(135deg,#e0f0ff 0%,#ff9ef0 50%,#a0f0ff 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shimmer 5s linear infinite;
+  }
+  @keyframes shimmer { 0% { background-position:0% center; } 100% { background-position:200% center; } }
+  .w-sig { margin-top:24px; font-size:1.1rem; color:#8899bb; letter-spacing:3px; font-weight:300; line-height:1.9; }
+  .w-loc {
+    display:inline-flex; align-items:center; gap:8px;
+    margin-top:28px; padding:10px 26px; border-radius:40px;
+    font-size:.82rem; color:#9bbaff; letter-spacing:2px;
+    background:rgba(160,240,255,.06);
+    border:1px solid rgba(160,240,255,.15);
+  }
+  .enter-btn {
+    margin-top:60px; padding:20px 68px;
+    border:none; border-radius:50px;
+    background:linear-gradient(135deg,#4a7aff,#a855f7,#ec4899);
+    color:#fff; font-size:1.05rem; font-weight:600;
+    letter-spacing:4px; cursor:pointer;
+    box-shadow:0 14px 45px rgba(168,85,247,.4);
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s;
+    font-family:inherit;
+    will-change:transform;
+  }
+  .enter-btn:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 22px 60px rgba(168,85,247,.55); }
+  .enter-btn:active { transform:scale(.96); }
+
+  #page-home { padding-bottom:80px; }
+  .home-nav {
+    position:sticky; top:0; z-index:20;
+    padding:18px 40px;
+    display:flex; align-items:center; justify-content:space-between;
+    background:linear-gradient(180deg,rgba(6,8,14,.9) 0%,rgba(6,8,14,.4) 75%,transparent 100%);
+    backdrop-filter:blur(12px);
+  }
+  @media (max-width:768px) { .home-nav { padding:18px 20px; } }
+  .home-nav .brand { display:flex; align-items:center; gap:10px; font-size:.95rem; font-weight:600; color:#d0e0ff; letter-spacing:2px; }
+  .home-nav .brand .dot-logo {
+    width:36px; height:36px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:800; color:#a0f0ff;
+    background:linear-gradient(145deg,#1a1d2a,#0f1118);
+    border:1px solid rgba(160,240,255,.25);
+    letter-spacing:0; overflow:hidden;
+  }
+  .home-nav .nav-links { display:flex; gap:26px; flex-wrap:wrap; }
+  @media (max-width:600px) { .home-nav .nav-links { gap:16px; } }
+  .home-nav .nav-links a {
+    font-size:.8rem; color:#6a7a99; text-decoration:none;
+    letter-spacing:2px; cursor:pointer;
+    transition:color .25s;
+  }
+  .home-nav .nav-links a:hover { color:#d0e0ff; }
+  
+  .hero-home {
+    max-width:1200px; margin:0 auto; width:100%;
+    padding:80px 40px 60px; text-align:center; position:relative;
+  }
+  @media (max-width:768px) { .hero-home { padding:50px 20px 40px; } }
+  .hero-home .hero-content { position:relative; z-index:2; }
+  .hero-home .hero-eyebrow { font-size:.75rem; color:#9bbaff; letter-spacing:6px; text-transform:uppercase; margin-bottom:20px; }
+  .hero-home .welcome-line { font-size:clamp(1.1rem,3.5vw,1.6rem); color:#8899bb; letter-spacing:10px; font-weight:300; margin-bottom:20px; }
+  
+  /* 【终极暴力修复】这里强制加高、加背景，绝不可能被吃掉 */
+  .hero-home .nest-title {
+    font-family:'ZCOOL KuaiLe', 'Ma Shan Zheng', cursive;
+    font-size:clamp(3rem,10vw,6rem);
+    font-weight:900; line-height:1.2; letter-spacing:6px;
+    color: #ff9ef0; 
+    text-shadow: 0 0 30px rgba(255,158,240,.4), 0 0 10px rgba(160,240,255,.6);
+    display: block !important;
+    min-height: 120px; /* 强制撑开高度 */
+    margin: 20px 0 40px 0;
+  }
+  
+  .hero-home .hero-welcome-text {
+    margin-top:20px; font-size:1rem; color:#8899bb;
+    letter-spacing:2px; line-height:2.1;
+    max-width:560px; margin-left:auto; margin-right:auto;
+  }
+  .hero-home .hero-cta { margin-top:40px; display:flex; gap:18px; justify-content:center; flex-wrap:wrap; }
+  .btn-primary, .btn-ghost {
+    padding:15px 40px; border-radius:50px;
+    font-size:.88rem; font-weight:600; letter-spacing:2px;
+    cursor:pointer; border:none;
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, background .3s;
+    font-family:inherit;
+  }
+  .btn-primary {
+    background:linear-gradient(135deg,#4a7aff,#a855f7,#ec4899);
+    color:#fff;
+    box-shadow:0 12px 40px rgba(168,85,247,.4);
+  }
+  .btn-primary:hover { transform:translateY(-3px) scale(1.03); box-shadow:0 18px 55px rgba(168,85,247,.55); }
+  .btn-ghost { background:transparent; color:#9bbaff; border:1px solid rgba(160,240,255,.25); }
+  .btn-ghost:hover { background:rgba(160,240,255,.08); transform:translateY(-3px); }
+  .stats-band {
+    max-width:1200px; margin:0 auto; width:100%;
+    padding:50px 40px;
+    display:flex; justify-content:space-around; flex-wrap:wrap; gap:40px;
+    border-top:1px solid rgba(255,255,255,.05);
+    border-bottom:1px solid rgba(255,255,255,.05);
+    position:relative; z-index:1;
+  }
+  @media (max-width:768px) { .stats-band { padding:40px 20px; gap:30px; } }
+  .stat-cell { text-align:center; flex:1; min-width:120px; }
+  .stat-cell .num { font-size:2.4rem; font-weight:800; color:#e0f0ff; letter-spacing:1px; }
+  .stat-cell .lbl { margin-top:8px; font-size:.72rem; color:#5a6a88; letter-spacing:3px; text-transform:uppercase; }
+  .preview-section { max-width:1200px; margin:0 auto; width:100%; padding:80px 40px 40px; position:relative; z-index:1; }
+  @media (max-width:768px) { .preview-section { padding:60px 20px 30px; } }
+  .preview-section .sec-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:36px; flex-wrap:wrap; gap:12px; }
+  .preview-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:26px; }
+  @media (min-width:1024px) { .preview-grid { grid-template-columns:repeat(3, 1fr); } }
+  .preview-card {
+    border-radius:20px; overflow:hidden;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(160,240,255,.1);
+    cursor:pointer;
+    transition:transform .5s cubic-bezier(.34,1.56,.64,1), border-color .4s, box-shadow .4s;
+  }
+  .preview-card:hover { transform:translateY(-8px) scale(1.02); border-color:rgba(160,240,255,.3); box-shadow:0 24px 60px rgba(0,255,255,.12); }
+  .preview-card .pc-thumb { width:100%; aspect-ratio:16/9; background:#0a0d14; position:relative; overflow:hidden; }
+  .preview-card .pc-thumb video { width:100%; height:100%; object-fit:cover; display:block; }
+  .preview-card .pc-meta { padding:18px 20px; }
+  .preview-card .pc-meta .pc-t { font-size:.95rem; color:#d0e0ff; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .preview-card .pc-meta .pc-s { margin-top:6px; font-size:.72rem; color:#5a6a88; letter-spacing:2px; }
+  .about-band {
+    max-width:1200px; margin:0 auto; width:100%;
+    padding:80px 40px;
+    display:grid; grid-template-columns:1fr 1fr; gap:70px;
+    position:relative; z-index:1;
+  }
+  @media (max-width:768px) { .about-band { grid-template-columns:1fr; gap:40px; padding:60px 20px; } }
+  .about-band .ab-text .ab-p { margin-top:20px; font-size:.92rem; color:#8899bb; line-height:2.1; letter-spacing:.5px; }
+  .about-band .ab-tags { margin-top:28px; display:flex; flex-wrap:wrap; gap:10px; }
+  .about-band .ab-tags span {
+    font-size:.76rem; padding:8px 18px; border-radius:30px;
+    background:rgba(160,240,255,.06); border:1px solid rgba(160,240,255,.12);
+    color:#9bbaff; letter-spacing:1px;
+  }
+  .style-cards { display:flex; flex-direction:column; gap:18px; }
+  .style-card {
+    padding:26px 28px; border-radius:18px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+    transition:transform .4s cubic-bezier(.34,1.56,.64,1), border-color .3s;
+  }
+  .style-card:hover { transform:translateX(8px); border-color:rgba(160,240,255,.2); }
+  .style-card .sc-num { font-size:.7rem; color:#5a6a88; letter-spacing:3px; }
+  .style-card .sc-title { margin-top:10px; font-size:1.05rem; color:#d0e0ff; font-weight:600; letter-spacing:1px; }
+  .style-card .sc-desc { margin-top:10px; font-size:.82rem; color:#6a7a99; line-height:1.9; }
+  .home-footer {
+    max-width:1200px; margin:0 auto; width:100%;
+    padding:60px 40px 40px; text-align:center;
+    border-top:1px solid rgba(255,255,255,.05);
+    position:relative; z-index:1;
+  }
+  .home-footer .hf-name { font-size:1.2rem; font-weight:700; letter-spacing:5px; color:#e0f0ff; }
+  .home-footer .hf-sig { margin-top:12px; font-size:.78rem; color:#4a5a7a; letter-spacing:3px; }
+  .home-footer .hf-links { margin-top:26px; display:flex; justify-content:center; gap:26px; flex-wrap:wrap; }
+  .home-footer .hf-links a { font-size:.76rem; color:#6a7a99; text-decoration:none; letter-spacing:2px; cursor:pointer; transition:color .25s; }
+  .home-footer .hf-links a:hover { color:#9bbaff; }
+
+  #page-works { padding-bottom:80px; position:relative; }
+  .works-list {
+    max-width:1200px; margin:40px auto 0; width:100%; padding:0 40px;
+    display:grid; grid-template-columns:1fr; gap:32px;
+    position:relative; z-index:1;
+  }
+  @media (min-width:1024px) { .works-list { grid-template-columns:repeat(2, 1fr); } }
+  @media (max-width:768px) { .works-list { padding:0 20px; gap:24px; } }
+  .v-card {
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(160,240,255,.1);
+    border-radius:24px; overflow:hidden;
+    cursor:pointer;
+    transition:border-color .4s, box-shadow .4s, transform .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .v-card:hover { border-color:rgba(160,240,255,.3); box-shadow:0 30px 100px rgba(0,255,255,.12); transform:translateY(-6px) scale(1.01); }
+  .v-wrap { position:relative; width:100%; aspect-ratio:16/9; background:#05070a; overflow:hidden; }
+  .v-wrap video { width:100%; height:100%; display:block; object-fit:contain; background:#000; }
+  .v-info { padding:20px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+  .v-title { font-size:1rem; font-weight:600; color:#d0e0ff; }
+  .v-badge {
+    font-size:.7rem; padding:5px 14px; border-radius:20px;
+    background:linear-gradient(135deg,rgba(255,105,180,.2),rgba(168,85,247,.2));
+    border:1px solid rgba(255,105,180,.3); color:#ffb0d0; letter-spacing:1px;
+  }
+  .empty { text-align:center; padding:80px 24px; color:#3a4a66; font-size:.9rem; background:rgba(255,255,255,.02); border:1px dashed rgba(255,255,255,.08); border-radius:24px; grid-column:1/-1; }
+  .empty .icon { font-size:3.4rem; opacity:.4; margin-bottom:16px; }
+  .loading-row { text-align:center; padding:60px 24px; color:#5a6a88; font-size:.85rem; grid-column:1/-1; }
+  .loading-row .dot { animation:blink 1.4s infinite both; }
+  .loading-row .dot:nth-child(2) { animation-delay:.2s; }
+  .loading-row .dot:nth-child(3) { animation-delay:.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:.3;} 40%{opacity:1;} }
+
+  #page-detail { background:#06080e; }
+  .detail-body { max-width:1000px; margin:0 auto; width:100%; padding:30px 40px 100px; }
+  @media (max-width:768px) { .detail-body { padding:20px 20px 80px; } }
+  .detail-video {
+    width:100%; border-radius:20px; overflow:hidden;
+    background:#000; aspect-ratio:16/9;
+    border:1px solid rgba(160,240,255,.1);
+  }
+  .detail-video video { width:100%; height:100%; display:block; object-fit:contain; }
+  .detail-meta {
+    margin-top:28px; padding:32px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:20px;
+  }
+  .detail-meta .dm-title { font-size:1.4rem; font-weight:700; color:#e0f0ff; letter-spacing:1px; }
+  .detail-meta .dm-tags { margin-top:18px; display:flex; flex-wrap:wrap; gap:8px; }
+  .detail-meta .dm-tags span {
+    font-size:.74rem; padding:7px 16px; border-radius:20px;
+    background:rgba(160,240,255,.06); border:1px solid rgba(160,240,255,.12);
+    color:#9bbaff; letter-spacing:1px;
+  }
+  .detail-meta .dm-badge {
+    margin-top:22px; display:inline-block;
+    font-size:.72rem; padding:6px 16px; border-radius:20px;
+    background:linear-gradient(135deg,rgba(255,105,180,.2),rgba(168,85,247,.2));
+    border:1px solid rgba(255,105,180,.3); color:#ffb0d0;
+  }
+
+  #page-about { padding-bottom:80px; position:relative; }
+  .about-page-body { max-width:900px; margin:40px auto 0; width:100%; padding:0 40px; position:relative; z-index:1; }
+  @media (max-width:768px) { .about-page-body { padding:0 20px; } }
+  .about-block { margin-bottom:50px; }
+  .about-block .ab-label { font-size:.7rem; color:#5a6a88; letter-spacing:4px; text-transform:uppercase; margin-bottom:14px; }
+  .about-block .ab-text { font-size:.95rem; color:#8899bb; line-height:2.2; letter-spacing:.5px; }
+  .about-block .ab-text strong { color:#d0e0ff; font-weight:500; }
+  .about-quote {
+    margin:50px 0; padding:36px 34px;
+    border-left:3px solid #a855f7;
+    background:rgba(255,255,255,.02);
+    border-radius:0 16px 16px 0;
+  }
+  .about-quote .q-text { font-size:1.3rem; color:#d0e0ff; letter-spacing:1px; line-height:1.9; }
+  .about-quote .q-from { margin-top:16px; font-size:.76rem; color:#5a6a88; letter-spacing:2px; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:20px; }
+  @media (max-width:600px) { .info-grid { grid-template-columns:1fr; } }
+  .info-grid .ig-cell { padding:22px 24px; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); }
+  .info-grid .ig-cell .ig-k { font-size:.7rem; color:#5a6a88; letter-spacing:2px; text-transform:uppercase; }
+  .info-grid .ig-cell .ig-v { margin-top:8px; font-size:1.05rem; color:#d0e0ff; font-weight:600; }
+
+  #page-dance { padding-bottom:80px; position:relative; }
+  .timeline { max-width:860px; margin:40px auto 0; width:100%; padding:0 40px; position:relative; z-index:1; }
+  @media (max-width:768px) { .timeline { padding:0 20px; } }
+  .timeline::before {
+    content:''; position:absolute; left:calc(40px + 9px); top:0; bottom:0;
+    width:2px;
+    background:linear-gradient(180deg,#4a7aff,#a855f7,#ec4899,transparent);
+    opacity:.4;
+  }
+  @media (max-width:768px) { .timeline::before { left:calc(20px + 9px); } }
+  .tl-item { position:relative; padding-left:50px; margin-bottom:50px; }
+  @media (max-width:768px) { .tl-item { padding-left:44px; } }
+  .tl-item .tl-dot {
+    position:absolute; left:calc(40px - 3px + 1px); top:6px;
+    width:14px; height:14px; border-radius:50%;
+    background:linear-gradient(135deg,#4a7aff,#ec4899);
+    border:2px solid #06080e;
+  }
+  @media (max-width:768px) { .tl-item .tl-dot { left:calc(20px - 3px + 1px); } }
+  .tl-item .tl-date { font-size:.7rem; color:#5a6a88; letter-spacing:3px; text-transform:uppercase; }
+  .tl-item .tl-title { margin-top:8px; font-size:1.2rem; color:#d0e0ff; font-weight:700; letter-spacing:1px; }
+  .tl-item .tl-desc { margin-top:12px; font-size:.9rem; color:#8899bb; line-height:2; }
+  .tl-item .tl-desc strong { color:#9bbaff; font-weight:500; }
+  .teacher-card { max-width:860px; margin:60px auto 0; width:100%; padding:0 40px; position:relative; z-index:1; }
+  @media (max-width:768px) { .teacher-card { padding:0 20px; } }
+  .teacher-card .tc-inner {
+    padding:36px 34px; border-radius:20px;
+    background:linear-gradient(145deg,rgba(168,85,247,.08),rgba(74,122,255,.05));
+    border:1px solid rgba(168,85,247,.2);
+  }
+  .teacher-card .tc-label { font-size:.7rem; color:#5a6a88; letter-spacing:4px; text-transform:uppercase; }
+  .teacher-card .tc-name { margin-top:14px; font-size:1.6rem; font-weight:800; letter-spacing:2px; color:#e0f0ff; }
+  .teacher-card .tc-desc { margin-top:16px; font-size:.9rem; color:#8899bb; line-height:2; }
+
+  #page-contact { padding-bottom:80px; position:relative; }
+  .contact-body { max-width:1000px; margin:40px auto 0; width:100%; padding:0 40px; position:relative; z-index:1; }
+  @media (max-width:768px) { .contact-body { padding:0 20px; } }
+  .contact-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:24px; margin-top:36px; }
+  @media (min-width:1024px) { .contact-cards { grid-template-columns:repeat(3,1fr); } }
+  .contact-card {
+    padding:36px 28px; border-radius:22px; text-align:center;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+    cursor:pointer;
+    transition:transform .4s cubic-bezier(.34,1.56,.64,1), border-color .3s, box-shadow .3s;
+  }
+  .contact-card:hover { transform:translateY(-8px); border-color:rgba(160,240,255,.25); box-shadow:0 20px 50px rgba(0,255,255,.08); }
+  .contact-card .cc-icon { font-size:2.6rem; margin-bottom:18px; }
+  .contact-card .cc-name { font-size:1.1rem; color:#d0e0ff; font-weight:600; letter-spacing:2px; }
+  .contact-card .cc-desc { margin-top:12px; font-size:.82rem; color:#6a7a99; line-height:1.9; }
+
+  #page-site { padding-bottom:80px; background:#06080e; position:relative; }
+  .site-body { max-width:900px; margin:40px auto 0; width:100%; padding:0 40px; }
+  @media (max-width:768px) { .site-body { padding:0 20px; } }
+  .site-block { margin-bottom:46px; }
+  .site-block .sb-label { font-size:.7rem; color:#5a6a88; letter-spacing:4px; text-transform:uppercase; margin-bottom:14px; }
+  .site-block .sb-text { font-size:.95rem; color:#8899bb; line-height:2.2; letter-spacing:.5px; }
+  .site-block .sb-text strong { color:#d0e0ff; font-weight:500; }
+  .site-note {
+    margin-top:44px; padding:30px 32px; border-radius:18px;
+    background:rgba(255,105,180,.05);
+    border:1px solid rgba(255,105,180,.15);
+    font-size:.86rem; color:#8899bb; line-height:2.1;
+  }
+  .site-note strong { color:#ffb0d0; }
+  .site-contact {
+    margin-top:36px; padding:32px; border-radius:18px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+  }
+  .site-contact .sc-title2 { font-size:.7rem; color:#5a6a88; letter-spacing:4px; text-transform:uppercase; margin-bottom:18px; }
+  .site-contact .sc-line { font-size:.95rem; color:#d0e0ff; line-height:2.4; letter-spacing:.5px; }
+  .site-contact .sc-line span { color:#7a8aaa; margin-right:10px; }
+</style>
+</head>
+<body>
+
+<div class="theme-bg" id="themeBg"></div>
+<div class="theme-img-bg" id="themeImgBg"></div>
+
+<!-- 欢迎页 -->
+<div class="page active" id="page-welcome">
+  <div class="welcome-inner">
+    <div class="avatar-big" id="wAvatar"><span>妖</span></div>
+    <h1 class="w-name" id="wName">菠萝小妖💃</h1>
+    <p class="w-sig" id="wSig">帅是常态，甜是彩蛋，随机切换</p>
+    <div class="w-loc" id="wLoc">📍 陕西 · 宝鸡</div>
+    <button class="enter-btn" id="enterBtn">进入小窝</button>
+  </div>
+</div>
+
+<!-- 品牌首页 -->
+<div class="page" id="page-home">
+  <div class="home-nav">
+    <div class="brand">
+      <div class="dot-logo" id="homeDotLogo"><span>妖</span></div>
+      <span>菠萝小妖</span>
+    </div>
+    <div class="nav-links">
+      <a data-nav="works">作品</a>
+      <a data-nav="about">关于</a>
+      <a data-nav="dance">学舞</a>
+      <a data-nav="contact">关注</a>
+      <a data-nav="site">本站</a>
+    </div>
+  </div>
+  
+  <div class="hero-home">
+    <div class="page-hero-bg" id="homeHeroBg"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Welcome to</div>
+      <div class="welcome-line">欢迎光临</div>
+      <h1 class="nest-title">小妖的小窝</h1>
+      <p class="hero-welcome-text">
+        这里是小妖的舞蹈小窝。<br>
+        卡点、手势舞、慢摇，随节奏落进来。<br>
+        随便逛逛，喜欢就多待一会儿。
+      </p>
+      <div class="hero-cta">
+        <button class="btn-primary" id="goWorks">进窝看作品</button>
+        <button class="btn-ghost" id="goAbout">了解她</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="stats-band">
+    <div class="stat-cell"><div class="num">40W+</div><div class="lbl">粉丝</div></div>
+    <div class="stat-cell"><div class="num">100+</div><div class="lbl">作品</div></div>
+    <div class="stat-cell"><div class="num">10-20s</div><div class="lbl">单条时长</div></div>
+    <div class="stat-cell"><div class="num">卡点</div><div class="lbl">主攻风格</div></div>
+  </div>
+  <div class="preview-section">
+    <div class="sec-head">
+      <div><div class="sec-label">Selected</div><div class="sec-title">精选作品</div></div>
+      <button class="btn-ghost" id="viewAllWorks" style="padding:10px 26px; font-size:.78rem;">查看全部 →</button>
+    </div>
+    <div class="preview-grid" id="previewGrid">
+      <div class="loading-row" id="previewLoading">正在加载...</div>
+    </div>
+  </div>
+  <div class="about-band">
+    <div class="ab-text">
+      <div class="sec-label">About</div>
+      <div class="sec-title">清爽短发 · 可盐可甜</div>
+      <p class="ab-p">潮流舞蹈博主，IP属地陕西宝鸡。主打热门卡点手势舞与慢摇，视频短平快、强卡点，单人solo与双人合拍居多，持续更新网友点舞。</p>
+      <p class="ab-p">她是女生，只是剪了清爽短发，风格偏酷帅灵动，不是软萌路线。签名“帅是常态，甜是彩蛋”正是她切换感的写照。</p>
+      <div class="ab-tags">
+        <span>热门卡点</span><span>手势舞</span><span>慢摇</span><span>清爽短发</span><span>网友点舞</span>
+      </div>
+    </div>
+    <div class="style-cards">
+      <div class="style-card"><div class="sc-num">01</div><div class="sc-title">酷帅 · 灵动</div><div class="sc-desc">清爽短发，兼顾帅气与灵动，穿搭偏休闲工装、潮牌、棒球帽。</div></div>
+      <div class="style-card"><div class="sc-num">02</div><div class="sc-title">短平快 · 强卡点</div><div class="sc-desc">大多10-20秒，适配热门DJ、电子BGM，节奏利落。</div></div>
+      <div class="style-card"><div class="sc-num">03</div><div class="sc-title">互动 · 翻牌点舞</div><div class="sc-desc">粉丝经常点舞，她会翻牌跳大家点名的舞蹈，与小伙伴合拍。</div></div>
+    </div>
+  </div>
+  <div class="home-footer">
+    <div class="hf-name">菠萝小妖💃</div>
+    <div class="hf-sig">帅是常态 · 甜是彩蛋</div>
+    <div class="hf-links">
+      <a data-nav="works">作品</a><a data-nav="about">关于</a><a data-nav="dance">学舞</a><a data-nav="contact">关注</a><a data-nav="site">本站</a><a data-nav="welcome">返回首页</a>
+    </div>
+  </div>
+</div>
+
+<!-- 作品墙 -->
+<div class="page" id="page-works">
+  <div class="top-bar">
+    <div class="nav-btn" id="worksBack">←</div>
+    <div class="home-btn" onclick="goHome()">首页</div>
+    <div class="tb-title">全部作品</div>
+  </div>
+  <div class="page-hero-bg" id="worksHeroBg"></div>
+  <div class="section" style="padding-top:50px; text-align:center;">
+    <div class="sec-label">All Works</div><div class="sec-title">作品集</div><div class="sec-desc">每一条都是节奏的切片</div>
+  </div>
+  <div class="works-list" id="worksList">
+    <div class="loading-row" id="worksLoading">正在加载...</div>
+  </div>
+</div>
+
+<!-- 作品详情 -->
+<div class="page" id="page-detail">
+  <div class="top-bar">
+    <div class="nav-btn" id="detailBack">←</div>
+    <div class="home-btn" onclick="goHome()">首页</div>
+    <div class="tb-title" id="dtTitle">作品详情</div>
+  </div>
+  <div class="detail-body">
+    <div class="detail-video" id="detailVideoWrap"></div>
+    <div class="detail-meta">
+      <div class="dm-title" id="dmTitle">—</div>
+      <div class="dm-tags"><span>热门卡点</span><span>舞蹈</span><span>可盐可甜</span></div>
+      <div class="dm-badge">菠萝小妖</div>
+    </div>
+  </div>
+</div>
+
+<!-- 关于她 -->
+<div class="page" id="page-about">
+  <div class="top-bar">
+    <div class="nav-btn" id="aboutBack">←</div>
+    <div class="home-btn" onclick="goHome()">首页</div>
+    <div class="tb-title">关于她</div>
+  </div>
+  <div class="page-hero-bg" id="aboutHeroBg"></div>
+  <div class="about-page-body">
+    <div class="about-block">
+      <div class="ab-label">Who</div>
+      <div class="ab-text"><strong>菠萝小妖💃</strong>，潮流舞蹈博主，IP属地陕西宝鸡。她是女生，剪了清爽短发，风格偏酷帅灵动。主页签名“帅是常态，甜是彩蛋，随机切换”，正是她风格切换感的写照。</div>
+    </div>
+    <div class="about-quote">
+      <div class="q-text">“帅是常态，甜是彩蛋，随机切换。”</div>
+      <div class="q-from">— 小妖的主页签名</div>
+    </div>
+    <div class="about-block">
+      <div class="ab-label">Content</div>
+      <div class="ab-text">主打<strong>热门卡点手势舞、慢摇舞蹈短视频</strong>。内容以热门BGM卡点舞、手势舞、网络热门摇舞为主，包含越南鼓、复仇摇、星奇摇、呲牙舞等全网热门挑战。有单人solo，也有双人合拍，常于室内、户外、景区、校园场景拍摄。</div>
+    </div>
+    <div class="about-block">
+      <div class="ab-label">Style</div>
+      <div class="ab-text">清爽短发，可盐可甜。视频节奏短平快（大多10-20秒），强卡点，适配热门DJ、电子BGM。穿搭偏休闲工装、潮牌、棒球帽、墨镜等潮流搭配。</div>
+    </div>
+    <div class="about-block">
+      <div class="ab-label">Interaction</div>
+      <div class="ab-text">粉丝经常点舞，她会翻牌跳大家点名的舞蹈，并与小伙伴合拍。</div>
+    </div>
+    <div class="about-block">
+      <div class="ab-label">Profile</div>
+      <div class="info-grid">
+        <div class="ig-cell"><div class="ig-k">粉丝规模</div><div class="ig-v">40W+</div></div>
+        <div class="ig-cell"><div class="ig-k">IP属地</div><div class="ig-v">陕西 · 宝鸡</div></div>
+        <div class="ig-cell"><div class="ig-k">内容定位</div><div class="ig-v">潮流舞蹈 · 卡点</div></div>
+        <div class="ig-cell"><div class="ig-k">风格</div><div class="ig-v">可盐可甜</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 学舞经历 -->
+<div class="page" id="page-dance">
+  <div class="top-bar">
+    <div class="nav-btn" id="danceBack">←</div>
+    <div class="home-btn" onclick="goHome()">首页</div>
+    <div class="tb-title">学舞经历</div>
+  </div>
+  <div class="page-hero-bg" id="danceHeroBg"></div>
+  <div class="section" style="padding-top:50px; text-align:center;">
+    <div class="sec-label">Dance Journey</div><div class="sec-title">学舞之路</div><div class="sec-desc">从 SR 舞蹈工作室出发</div>
+  </div>
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">起点</div><div class="tl-title">SR 舞蹈工作室</div><div class="tl-desc">小妖曾在 <strong>SR 舞蹈工作室</strong> 学舞。SR 是她学舞的地方，不是她所属的机构。在这里打下了卡点舞、手势舞的基础。</div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">老师</div><div class="tl-title">小蕊老师</div><div class="tl-desc">她的舞蹈老师是 <strong>小蕊老师</strong>。在小蕊老师的指导下，逐步形成清爽利落的卡点风格。</div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">成长</div><div class="tl-title">从课堂到镜头</div><div class="tl-desc">把课堂上学到的节奏感带到短视频里，短平快、强卡点，逐渐形成自己的风格。</div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">现在</div><div class="tl-title">持续更新 · 翻牌点舞</div><div class="tl-desc">持续更新热门舞蹈挑战，翻牌粉丝点舞，与小伙伴合拍，保持清爽利落的镜头表达。</div></div>
+  </div>
+  <div class="teacher-card">
+    <div class="tc-inner">
+      <div class="tc-label">Teacher</div>
+      <div class="tc-name">小蕊老师</div>
+      <div class="tc-desc">小妖的舞蹈老师。在 SR 舞蹈工作室指导小妖学舞，帮助她打下卡点舞与手势舞的基础。</div>
+    </div>
+  </div>
+</div>
+
+<!-- 关注 -->
+<div class="page" id="page-contact">
+  <div class="top-bar">
+    <div class="nav-btn" id="contactBack">←</div>
+    <div class="home-btn" onclick="goHome()">首页</div>
+    <div class="tb-title">关注她</div>
+  </div>
+  <div class="page-hero-bg" id="contactHeroBg"></div>
+  <div class="contact-body">
+    <div class="section" style="padding:50px 0 0; text-align:center;">
+      <div class="sec-label">Follow</div><div class="sec-title">关注小妖</div><div class="sec-desc">在以下平台找到她</div>
+    </div>
+    <div class="contact-cards">
+      <div class="contact-card" onclick="alert('把这里换成她的抖音主页链接')"><div class="cc-icon">🎵</div><div class="cc-name">抖音</div><div class="cc-desc">搜索“菠萝小妖💃”</div></div>
+      <div class="contact-card" onclick="alert('把这里换成她的快手主页链接')"><div class="cc-icon">⚡</div><div class="cc-name">快手</div><div class="cc-desc">搜索“菠萝小妖”</div></div>
+      <div class="contact-card" onclick="alert('把这里换成她的小红书主页链接')"><div class="cc-icon">📕</div><div class="cc-name">小红书</div><div class="cc-desc">搜索“菠萝小妖”</div></div>
+    </div>
+    <div class="site-note">
+      <strong>说明：</strong>本页面为粉丝向作品展示站，所有视频版权归原作者所有。视频展示需获得本人授权，请勿用于商业用途。
+    </div>
+  </div>
+</div>
+
+<!-- 关于本站 -->
+<div class="page" id="page-site">
+  <div class="top-bar">
+    <div class="nav-btn" id="siteBack">←</div>
+    <div class="home-btn" onclick="goHome()">首页</div>
+    <div class="tb-title">关于本站</div>
+  </div>
+  <div class="site-body">
+    <div class="site-block"><div class="sb-label">What</div><div class="sb-text">这是一个<strong>粉丝向的作品展示站</strong>，用于整理和展示菠萝小妖💃的公开舞蹈作品。页面本身不存储视频，视频通过 Supabase 云存储托管，本站仅做展示与索引。</div></div>
+    <div class="site-block"><div class="sb-label">Why</div><div class="sb-text">做这个站，是因为喜欢她的舞蹈，也想有一个干净、专注的地方，把她的作品按顺序整理起来，方便随时回看。</div></div>
+    <div class="site-block"><div class="sb-label">Copyright</div><div class="sb-text">所有视频、图片、文字内容的版权均归<strong>原作者（菠萝小妖）</strong>所有。本站不拥有这些内容的版权，仅作展示。如需使用，请联系本人获得授权。</div></div>
+    <div class="site-block"><div class="sb-label">Tech</div><div class="sb-text">前端：纯 HTML + CSS + JavaScript + Anime.js 动画库。<br>存储：Supabase Storage + Database。<br>托管：GitHub Pages。</div></div>
+    <div class="site-contact">
+      <div class="sc-title2">Contact</div>
+      <div class="sc-line"><span>E-mail</span> 3831926820@qq.com</div>
+      <div class="sc-line"><span>微信</span> ycx625110482</div>
+    </div>
+    <div class="site-note"><strong>提示：</strong>如果你是小妖本人，或她的团队，希望调整或删除本站内容，请通过上方联系方式告知，会第一时间处理。</div>
+  </div>
+</div>
+
+<script>
+/* ================= 配置区（自己填） ================= */
+const SUPABASE_URL = 'https://iadmzoukavnahjliorgq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8NhMWO807rD7xSVVyrPrcQ_1tpznF4I';
+/* =================================================== */
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentPage = 'welcome';
+let pageStack = ['welcome'];
+
+function switchPage(fromId, toId, direction = 'forward', done) {
+  const fromEl = document.getElementById('page-' + fromId);
+  const toEl = document.getElementById('page-' + toId);
+  if (!fromEl || !toEl) return;
+
+  const themeBg = document.getElementById('themeBg');
+  const themeImgBg = document.getElementById('themeImgBg');
+  if (toId === 'site') {
+    themeBg.style.opacity = '0';
+    themeImgBg.style.opacity = '0';
+  } else {
+    if (themeImgBg.classList.contains('show')) {
+      themeBg.style.opacity = '0';
+      themeImgBg.style.opacity = '1';
+    } else {
+      themeBg.style.opacity = '1';
+      themeImgBg.style.opacity = '0';
+    }
+  }
+
+  toEl.classList.add('active');
+  toEl.scrollTop = 0;
+
+  if (fromEl && fromEl !== toEl) {
+    fromEl.classList.remove('active');
+  }
+
+  anime.set(toEl, { translateY: direction === 'forward' ? 24 : -24 });
+  anime({
+    targets: toEl,
+    translateY: 0,
+    duration: 480,
+    easing: 'easeOutCubic',
+    complete: () => { if (done) done(); }
+  });
+
+  currentPage = toId;
+}
+
+function goHome() {
+  if (currentPage === 'home') return;
+  switchPage(currentPage, 'home', 'backward', () => ensureHomeLoaded());
+  pageStack = ['home'];
+}
+
+document.getElementById('enterBtn').addEventListener('click', () => {
+  switchPage('welcome', 'home', 'forward', () => ensureHomeLoaded());
+  pageStack.push('home');
+});
+document.getElementById('goWorks').addEventListener('click', () => {
+  switchPage('home', 'works', 'forward', () => ensureWorksLoaded());
+  pageStack.push('works');
+});
+document.getElementById('goAbout').addEventListener('click', () => {
+  switchPage('home', 'about', 'forward');
+  pageStack.push('about');
+});
+document.getElementById('viewAllWorks').addEventListener('click', () => {
+  switchPage('home', 'works', 'forward', () => ensureWorksLoaded());
+  pageStack.push('works');
+});
+document.querySelectorAll('[data-nav]').forEach(el => {
+  el.addEventListener('click', (e) => {
+    const target = e.currentTarget.dataset.nav;
+    if (target === currentPage) return;
+    if (target === 'works') {
+      switchPage(currentPage, 'works', 'forward', () => ensureWorksLoaded());
+    } else {
+      switchPage(currentPage, target, 'forward');
+    }
+    pageStack.push(target);
+  });
+});
+
+document.getElementById('worksBack').addEventListener('click', () => goBack('works'));
+document.getElementById('aboutBack').addEventListener('click', () => goBack('about'));
+document.getElementById('danceBack').addEventListener('click', () => goBack('dance'));
+document.getElementById('contactBack').addEventListener('click', () => goBack('contact'));
+document.getElementById('siteBack').addEventListener('click', () => goBack('site'));
+document.getElementById('detailBack').addEventListener('click', () => goBack('detail'));
+
+function goBack(fromId) {
+  const prev = pageStack[pageStack.length - 2] || 'home';
+  pageStack.pop();
+  switchPage(fromId, prev, 'backward', () => {
+    if (fromId === 'detail') document.getElementById('detailVideoWrap').innerHTML = '';
+  });
+}
+
+let homeLoaded = false;
+let worksLoaded = false;
+let allVideosCache = null;
+
+async function fetchVideos() {
+  if (allVideosCache) return allVideosCache;
+  const { data, error } = await db.from('videos').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  allVideosCache = data || [];
+  return allVideosCache;
+}
+
+async function ensureHomeLoaded() {
+  if (homeLoaded) return;
+  homeLoaded = true;
+  const grid = document.getElementById('previewGrid');
+  try {
+    const data = await fetchVideos();
+    if (!data.length) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">🎬</div><p>还没有作品，去后台上传第一个吧</p></div>`;
+      return;
+    }
+    const preview = data.slice(0, 6);
+    grid.innerHTML = preview.map(v => `
+      <div class="preview-card" data-url="${escapeAttr(v.url)}" data-title="${escapeAttr(v.title || '未命名视频')}">
+        <div class="pc-thumb">
+          <video playsinline preload="metadata" muted src="${escapeHtml(v.url)}"></video>
+        </div>
+        <div class="pc-meta">
+          <div class="pc-t">${escapeHtml(v.title || '未命名视频')}</div>
+          <div class="pc-s">舞蹈作品</div>
+        </div>
+      </div>
+    `).join('');
+    grid.addEventListener('click', (e) => {
+      const card = e.target.closest('.preview-card');
+      if (!card) return;
+      openDetail(card.dataset.url, card.dataset.title);
+    });
+    anime({
+      targets: '.preview-card',
+      opacity: [0, 1], translateY: [28, 0], scale: [0.96, 1],
+      duration: 700, delay: anime.stagger(70), easing: 'easeOutCubic'
+    });
+  } catch (err) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">⚠️</div><p>加载失败：${escapeHtml(err.message)}</p></div>`;
+  }
+}
+
+async function ensureWorksLoaded() {
+  if (worksLoaded) return;
+  worksLoaded = true;
+  const listEl = document.getElementById('worksList');
+  try {
+    const data = await fetchVideos();
+    if (!data.length) {
+      listEl.innerHTML = `<div class="empty"><div class="icon">🎬</div><p>还没有作品</p></div>`;
+      return;
+    }
+    listEl.innerHTML = data.map(v => `
+      <div class="v-card" data-url="${escapeAttr(v.url)}" data-title="${escapeAttr(v.title || '未命名视频')}">
+        <div class="v-wrap">
+          <video playsinline preload="metadata" src="${escapeHtml(v.url)}" muted></video>
+        </div>
+        <div class="v-info">
+          <span class="v-title">${escapeHtml(v.title || '未命名视频')}</span>
+          <span class="v-badge">小妖</span>
+        </div>
+      </div>
+    `).join('');
+    listEl.addEventListener('click', (e) => {
+      const card = e.target.closest('.v-card');
+      if (!card) return;
+      openDetail(card.dataset.url, card.dataset.title);
+    });
+    anime({
+      targets: '.v-card',
+      opacity: [0, 1], translateY: [32, 0], scale: [0.96, 1],
+      duration: 750, delay: anime.stagger(80), easing: 'easeOutCubic'
+    });
+  } catch (err) {
+    listEl.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>加载失败：${escapeHtml(err.message)}</p></div>`;
+  }
+}
+
+function openDetail(url, title) {
+  document.getElementById('dtTitle').textContent = title || '作品详情';
+  document.getElementById('dmTitle').textContent = title || '未命名作品';
+  const wrap = document.getElementById('detailVideoWrap');
+  wrap.innerHTML = `<video controls playsinline autoplay preload="metadata" src="${escapeHtml(url)}"></video>`;
+  switchPage(currentPage, 'detail', 'forward');
+  pageStack.push('detail');
+}
+
+async function loadSiteImages() {
+  try {
+    const { data, error } = await db.from('site_images').select('*');
+    if (error) throw error;
+    const map = {};
+    (data || []).forEach(row => { map[row.slot] = row.url; });
+
+    if (map.global_bg) {
+      const el = document.getElementById('themeImgBg');
+      el.style.backgroundImage = `url(${map.global_bg})`;
+      el.classList.add('show');
+      document.getElementById('themeBg').style.opacity = '0';
+    } else {
+      document.getElementById('themeImgBg').classList.remove('show');
+      document.getElementById('themeImgBg').style.backgroundImage = '';
+      document.getElementById('themeBg').style.opacity = '1';
+    }
+
+    const heroMap = { home: 'homeHeroBg', works: 'worksHeroBg', about: 'aboutHeroBg', dance: 'danceHeroBg', contact: 'contactHeroBg' };
+    Object.keys(heroMap).forEach(key => {
+      const slot = key + '_bg';
+      const el = document.getElementById(heroMap[key]);
+      if (el) {
+        if (map[slot]) {
+          el.style.backgroundImage = `url(${map[slot]})`;
+          el.classList.add('show');
+        } else {
+          el.style.backgroundImage = '';
+          el.classList.remove('show');
+        }
+      }
+    });
+
+    const wAvatar = document.getElementById('wAvatar');
+    const dotLogo = document.getElementById('homeDotLogo');
+    if (map.avatar) {
+      if (wAvatar) wAvatar.innerHTML = `<img src="${map.avatar}" alt="头像">`;
+      if (dotLogo) dotLogo.innerHTML = `<img src="${map.avatar}" alt="头像">`;
+    } else {
+      if (wAvatar) wAvatar.innerHTML = '<span>妖</span>';
+      if (dotLogo) dotLogo.innerHTML = '<span>妖</span>';
+    }
+  } catch (e) {
+    console.warn('图片加载失败，使用默认背景', e);
+  }
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeAttr(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+loadSiteImages();
+
+anime({ targets: '.avatar-big', scale: [0.6, 1], opacity: [0, 1], duration: 900, easing: 'easeOutElastic(1, .6)' });
+anime({ targets: '.w-name', opacity: [0, 1], translateY: [30, 0], duration: 800, delay: 200, easing: 'easeOutCubic' });
+anime({ targets: '.w-sig, .w-loc', opacity: [0, 1], translateY: [20, 0], duration: 700, delay: anime.stagger(120, { start: 400 }), easing: 'easeOutCubic' });
+anime({ targets: '.enter-btn', opacity: [0, 1], translateY: [30, 0], scale: [0.9, 1], duration: 800, delay: 700, easing: 'easeOutElastic(1, .5)' });
+</script>
+</body>
+</html>
