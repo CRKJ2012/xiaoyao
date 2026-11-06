@@ -14,6 +14,7 @@
     padding:40px 20px;
   }
   .box { width:100%; max-width:720px; }
+
   .head { margin-bottom:32px; padding-bottom:22px; border-bottom:1px solid #232a3d; }
   .head h1 { font-size:1.35rem; color:#fff; letter-spacing:1px; }
   .head .sub { margin-top:8px; font-size:.78rem; color:#6a7a99; letter-spacing:1px; line-height:1.7; }
@@ -22,6 +23,7 @@
     background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.25);
     color:#fca5a5; font-size:.7rem; letter-spacing:1px;
   }
+
   .config-block, .upload-block {
     padding:22px; border-radius:14px;
     background:#0f131c; border:1px solid #232a3d;
@@ -55,6 +57,7 @@
   button:active { transform:scale(.98); }
   button:disabled { opacity:.4; cursor:not-allowed; }
   button.secondary { background:#232a3d; }
+
   .status {
     margin-top:14px; padding:12px 14px; border-radius:9px;
     font-size:.83rem; display:none; line-height:1.7;
@@ -62,8 +65,10 @@
   .status.ok { display:block; background:rgba(52,211,153,.1); color:#6ee7b7; border:1px solid rgba(52,211,153,.25); }
   .status.err { display:block; background:rgba(248,113,113,.1); color:#fca5a5; border:1px solid rgba(248,113,113,.25); }
   .status.load { display:block; background:rgba(74,122,255,.1); color:#9bbaff; border:1px solid rgba(74,122,255,.25); }
+
   .progress { margin-top:12px; height:6px; background:#1a1f2e; border-radius:3px; overflow:hidden; display:none; }
   .progress .bar { height:100%; width:0%; background:linear-gradient(90deg,#4a7aff,#a855f7); transition:width .3s; }
+
   .list-block { margin-top:8px; }
   .list-block .lb-title { font-size:.75rem; color:#6a7a99; letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; }
   .item {
@@ -81,6 +86,7 @@
   }
   .item .del:hover { background:rgba(248,113,113,.1); }
   .empty-list { padding:30px; text-align:center; color:#3a4a66; font-size:.8rem; background:#0d111a; border:1px dashed #232a3d; border-radius:10px; }
+
   .help-box {
     margin-top:26px; padding:18px 20px; border-radius:12px;
     background:rgba(255,105,180,.05); border:1px solid rgba(255,105,180,.15);
@@ -88,12 +94,26 @@
   }
   .help-box strong { color:#ffb0d0; }
   .help-box code { background:rgba(160,240,255,.08); color:#a0f0ff; padding:1px 6px; border-radius:4px; font-size:.72rem; }
-  .img-preview { margin-top:8px; border-radius:8px; overflow:hidden; display:none; max-height:140px; }
+
+  .img-preview { margin-top:8px; border-radius:8px; overflow:hidden; display:none; max-height:140px; position:relative; }
   .img-preview img { width:100%; height:auto; display:block; max-height:140px; object-fit:cover; }
+  
+  /* 删除图片按钮 */
+  .del-img-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,.6); color: #fca5a5;
+    border: 1px solid rgba(248,113,113,.4);
+    padding: 4px 10px; border-radius: 6px;
+    font-size: .7rem; cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background .2s;
+  }
+  .del-img-btn:hover { background: rgba(248,113,113,.2); }
 </style>
 </head>
 <body>
 <div class="box">
+
   <div class="head">
     <h1>🍍 小妖小窝 · 后台</h1>
     <p class="sub">本文件仅在你自己的电脑上运行，用来上传/管理视频和图片。<br>不要上传到 GitHub，不要发给别人。</p>
@@ -107,8 +127,8 @@
       <input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co">
     </div>
     <div class="field">
-      <label>Secret Key <span class="hint-tag">service_role / sb_secret_...</span></label>
-      <input type="password" id="sbKey" placeholder="粘贴 Secret Key">
+      <label>Publishable Key <span class="hint-tag">填 Publishable Key (sb_publishable_...)</span></label>
+      <input type="password" id="sbKey" placeholder="粘贴 Publishable Key">
     </div>
     <button id="saveConfig" class="secondary">保存配置</button>
   </div>
@@ -129,10 +149,10 @@
   </div>
 
   <div class="upload-block">
-    <div class="up-title">上传站点图片</div>
+    <div class="up-title">上传站点图片 / 背景</div>
     <p style="font-size:.75rem;color:#5a6a88;margin-bottom:18px;line-height:1.8;">
-      每个位置上传后，主页面对应区域自动替换为你的图片。<br>
-      没上传的位置，会使用默认渐变背景。
+      每个位置上传后，主页面对应区域自动替换。<br>
+      点击预览图右上角的“删除”，可恢复为默认渐变背景。
     </p>
 
     <div class="field">
@@ -140,36 +160,43 @@
       <input type="file" id="img_avatar" accept="image/*" data-slot="avatar">
       <div class="img-preview" id="preview_avatar"></div>
     </div>
+
     <div class="field">
       <label>全局背景 <span class="hint-tag">显示在：所有页面共用的主题背景层</span></label>
       <input type="file" id="img_global_bg" accept="image/*" data-slot="global_bg">
       <div class="img-preview" id="preview_global_bg"></div>
     </div>
+
     <div class="field">
       <label>首页背景 <span class="hint-tag">显示在：首页“小妖的小窝”区域顶部</span></label>
       <input type="file" id="img_home_bg" accept="image/*" data-slot="home_bg">
       <div class="img-preview" id="preview_home_bg"></div>
     </div>
+
     <div class="field">
       <label>作品墙背景 <span class="hint-tag">显示在：全部作品页顶部</span></label>
       <input type="file" id="img_works_bg" accept="image/*" data-slot="works_bg">
       <div class="img-preview" id="preview_works_bg"></div>
     </div>
+
     <div class="field">
       <label>关于她背景 <span class="hint-tag">显示在：关于她页面顶部</span></label>
       <input type="file" id="img_about_bg" accept="image/*" data-slot="about_bg">
       <div class="img-preview" id="preview_about_bg"></div>
     </div>
+
     <div class="field">
       <label>学舞背景 <span class="hint-tag">显示在：学舞经历页面顶部</span></label>
       <input type="file" id="img_dance_bg" accept="image/*" data-slot="dance_bg">
       <div class="img-preview" id="preview_dance_bg"></div>
     </div>
+
     <div class="field">
       <label>关注页背景 <span class="hint-tag">显示在：关注她页面顶部</span></label>
       <input type="file" id="img_contact_bg" accept="image/*" data-slot="contact_bg">
       <div class="img-preview" id="preview_contact_bg"></div>
     </div>
+
     <div class="status" id="imgStatus"></div>
   </div>
 
@@ -181,18 +208,18 @@
   <div class="help-box">
     <strong>显示位置说明：</strong><br>
     视频上传后会自动出现在：① 首页「精选作品」网格（最新 6 个）② 「全部作品」页竖向列表 ③ 点击后进入「作品详情」页播放。<br><br>
-    <strong>图片显示位置：</strong><br>
-    每张图上传时，上方都标注了“显示在：XXX”，对应主页面具体区域。没上传的位置自动使用默认渐变背景。<br><br>
+    <strong>图片删除功能：</strong><br>
+    如果你想撤销某张图片，直接点击预览图右上角的“删除”。系统会自动删掉云存储里的文件，并清理数据库记录，主页面刷新后该位置自动恢复为默认渐变背景。<br><br>
     <strong>配置说明：</strong><br>
-    URL 和 Secret Key 只保存在你当前浏览器的 localStorage 里，不会上传到任何服务器。换浏览器或清缓存后需要重新填。<br><br>
-    <strong>文件名清洗：</strong><br>
-    上传时会自动把文件名里的中文、空格、特殊字符替换为下划线，只保留字母、数字、点、下划线、连字符，避免 <code>Invalid path</code> 错误。
+    URL 和 Publishable Key 只保存在你当前浏览器的 localStorage 里，不会上传到任何服务器。
   </div>
+
 </div>
 
 <script>
 const { createClient } = supabase;
 let db = null;
+let currentConfig = { url: '', key: '' };
 
 function safeName(str) {
   return String(str).replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -215,7 +242,11 @@ function loadConfig() {
   if (url && key) initClient(url, key);
 }
 function initClient(url, key) {
-  try { db = createClient(url, key); return true; }
+  try {
+    currentConfig = { url, key };
+    db = createClient(url, key); 
+    return true; 
+  }
   catch (e) { showStatus('err', '初始化失败：' + e.message); return false; }
 }
 function showStatus(type, msg) {
@@ -232,7 +263,7 @@ function showImgStatus(type, msg) {
 document.getElementById('saveConfig').onclick = () => {
   const url = document.getElementById('sbUrl').value.trim();
   const key = document.getElementById('sbKey').value.trim();
-  if (!url || !key) return showStatus('err', '请填写 URL 和 Secret Key');
+  if (!url || !key) return showStatus('err', '请填写 URL 和 Key');
   localStorage.setItem('sb_url', url);
   localStorage.setItem('sb_key', key);
   if (initClient(url, key)) {
@@ -242,6 +273,7 @@ document.getElementById('saveConfig').onclick = () => {
   }
 };
 
+/* ---------- 视频上传 ---------- */
 document.getElementById('uploadBtn').onclick = async () => {
   if (!db) return showStatus('err', '请先保存配置');
   const title = document.getElementById('videoTitle').value.trim() || '未命名视频';
@@ -260,16 +292,18 @@ document.getElementById('uploadBtn').onclick = async () => {
   try {
     const ext = safeExt(file, 'video');
     const fileName = safeName(`${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`);
-    console.log('上传文件名:', fileName);
-
+    
     bar.style.width = '30%';
     const { error: uploadErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
     if (uploadErr) throw uploadErr;
+    
     bar.style.width = '70%';
     const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
     const publicUrl = urlData.publicUrl;
+    
     const { error: dbErr } = await db.from('videos').insert({ title, url: publicUrl });
     if (dbErr) throw dbErr;
+    
     bar.style.width = '100%';
     showStatus('ok', '上传成功！主页面刷新即可看到。');
     document.getElementById('videoTitle').value = '';
@@ -322,6 +356,7 @@ async function delVideo(id, url) {
   } catch (e) { alert('删除失败：' + e.message); }
 }
 
+/* ---------- 图片上传与删除 ---------- */
 document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
   input.addEventListener('change', async () => {
     if (!db) return showImgStatus('err', '请先保存配置');
@@ -338,13 +373,19 @@ document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
 
       const { error: upErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
       if (upErr) throw upErr;
+      
       const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
       const publicUrl = urlData.publicUrl;
+      
       await db.from('site_images').delete().eq('slot', slot);
       const { error: dbErr } = await db.from('site_images').insert({ slot, url: publicUrl });
       if (dbErr) throw dbErr;
+      
       if (previewEl) {
-        previewEl.innerHTML = `<img src="${publicUrl}" alt="${slot}">`;
+        previewEl.innerHTML = `
+          <button class="del-img-btn" onclick="delImage('${slot}', '${publicUrl}')">删除图片</button>
+          <img src="${publicUrl}" alt="${slot}">
+        `;
         previewEl.style.display = 'block';
       }
       showImgStatus('ok', `「${slot}」上传成功，主页面刷新即可看到`);
@@ -354,6 +395,37 @@ document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
   });
 });
 
+// 删除图片的全局函数，供按钮调用
+window.delImage = async function(slot, url) {
+  if (!confirm(`确定要删除「${slot}」的图片吗？删除后该区域会恢复默认背景。`)) return;
+  if (!db) return;
+  
+  showImgStatus('load', '正在删除图片...');
+  try {
+    // 1. 从 storage 删除文件
+    const fileName = url.split('/').pop();
+    await db.storage.from('videos').remove([fileName]);
+    
+    // 2. 从数据库删掉记录
+    await db.from('site_images').delete().eq('slot', slot);
+    
+    // 3. 隐藏预览并清空
+    const previewEl = document.getElementById('preview_' + slot);
+    if (previewEl) {
+      previewEl.innerHTML = '';
+      previewEl.style.display = 'none';
+    }
+    
+    // 清空 input 的 value，允许重新选择同一个文件
+    const inputEl = document.querySelector(`input[data-slot="${slot}"]`);
+    if (inputEl) inputEl.value = '';
+
+    showImgStatus('ok', `「${slot}」图片已删除，主页面刷新即可看到恢复的背景`);
+  } catch (e) {
+    showImgStatus('err', '删除失败：' + e.message);
+  }
+};
+
 async function loadImagePreviews() {
   if (!db) return;
   try {
@@ -361,7 +433,10 @@ async function loadImagePreviews() {
     (data || []).forEach(row => {
       const previewEl = document.getElementById('preview_' + row.slot);
       if (previewEl) {
-        previewEl.innerHTML = `<img src="${row.url}" alt="${row.slot}">`;
+        previewEl.innerHTML = `
+          <button class="del-img-btn" onclick="delImage('${row.slot}', '${row.url}')">删除图片</button>
+          <img src="${row.url}" alt="${row.slot}">
+        `;
         previewEl.style.display = 'block';
       }
     });
