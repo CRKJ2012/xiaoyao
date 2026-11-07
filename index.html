@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>菠萝小妖💃 · 帅是常态，甜是彩蛋</title>
+<!-- 动态OG标签将会被JS插入到这里 -->
+<div id="og-container" style="display:none;"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
@@ -15,6 +18,51 @@
     font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;
     overflow-x:hidden;
   }
+  
+  /* 全站加载层 */
+  #global-loader {
+    position: fixed; inset: 0; z-index: 99999;
+    background: #06080e;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.6s ease;
+  }
+  .loader-content {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .loader-anim {
+    width: 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .loader-anim img {
+    width: 100%; height: 100%; object-fit: contain;
+    animation: spin 2s linear infinite;
+  }
+  .loader-anim video {
+    width: 100%; height: 100%; object-fit: contain;
+  }
+  .loader-text {
+    font-size: .85rem; color: #8899bb; letter-spacing: 4px;
+    animation: pulse 1.5s infinite alternate;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0% { opacity: 0.4; } 100% { opacity: 1; } }
+
+  /* 呼吸灯效果 */
+  .skeleton {
+    position: relative; overflow: hidden; background: #0a0d14;
+  }
+  .skeleton::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(160,240,255,.05), transparent);
+    animation: shimmerSkeleton 1.5s infinite;
+  }
+  @keyframes shimmerSkeleton {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* 背景视差 */
   .theme-bg {
     position:fixed; inset:0; z-index:0; pointer-events:none;
     background:
@@ -31,6 +79,7 @@
     color:rgba(160,240,255,.025);
     white-space:nowrap; pointer-events:none;
     font-family:'Ma Shan Zheng', 'PingFang SC', cursive;
+    will-change: transform;
   }
   .theme-img-bg {
     position:fixed; inset:0; z-index:0; pointer-events:none;
@@ -116,7 +165,6 @@
     opacity:.5; z-index:-1; filter:blur(18px);
     animation:spin 7s linear infinite;
   }
-  @keyframes spin { to { transform:rotate(360deg); } }
   .w-name {
     font-size:clamp(2.8rem,11vw,5rem); font-weight:800;
     letter-spacing:8px; line-height:1.1;
@@ -229,6 +277,21 @@
   .stat-cell { text-align:center; flex:1; min-width:120px; }
   .stat-cell .num { font-size:2.4rem; font-weight:800; color:#e0f0ff; letter-spacing:1px; }
   .stat-cell .lbl { margin-top:8px; font-size:.72rem; color:#5a6a88; letter-spacing:3px; text-transform:uppercase; }
+
+  /* 点赞按钮 */
+  .like-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+  .like-btn {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255, 105, 180, 0.1);
+    border: 1px solid rgba(255, 105, 180, 0.3);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .like-btn svg { width: 28px; height: 28px; fill: rgba(255, 105, 180, 0.5); transition: fill 0.2s; }
+  .like-btn:hover { transform: scale(1.1); background: rgba(255, 105, 180, 0.15); }
+  .like-btn:active { transform: scale(0.9); }
+  .like-btn.liked svg { fill: #ff69b4; filter: drop-shadow(0 0 8px #ff69b4); }
+  .like-cell .num { font-size: 1.8rem; font-weight: 800; color: #ffb0d0; }
   
   .preview-section { max-width:1200px; margin:0 auto; width:100%; padding:80px 40px 40px; position:relative; z-index:1; }
   @media (max-width:768px) { .preview-section { padding:60px 20px 30px; } }
@@ -243,8 +306,8 @@
     transition:transform .5s cubic-bezier(.34,1.56,.64,1), border-color .4s, box-shadow .4s;
   }
   .preview-card:hover { transform:translateY(-8px) scale(1.02); border-color:rgba(160,240,255,.3); box-shadow:0 24px 60px rgba(0,255,255,.12); }
-  .preview-card .pc-thumb { width:100%; aspect-ratio:16/9; background:#0a0d14; position:relative; overflow:hidden; }
-  .preview-card .pc-thumb video { width:100%; height:100%; object-fit:cover; display:block; }
+  .preview-card .pc-thumb { width:100%; aspect-ratio:16/9; position:relative; overflow:hidden; }
+  .preview-card .pc-thumb video { width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1; }
   .preview-card .pc-meta { padding:18px 20px; }
   .preview-card .pc-meta .pc-t { font-size:.95rem; color:#d0e0ff; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .preview-card .pc-meta .pc-s { margin-top:6px; font-size:.72rem; color:#5a6a88; letter-spacing:2px; }
@@ -303,8 +366,8 @@
     transition:border-color .4s, box-shadow .4s, transform .5s cubic-bezier(.34,1.56,.64,1);
   }
   .v-card:hover { border-color:rgba(160,240,255,.3); box-shadow:0 30px 100px rgba(0,255,255,.12); transform:translateY(-6px) scale(1.01); }
-  .v-wrap { position:relative; width:100%; aspect-ratio:16/9; background:#05070a; overflow:hidden; }
-  .v-wrap video { width:100%; height:100%; display:block; object-fit:contain; background:#000; }
+  .v-wrap { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; }
+  .v-wrap video { width:100%; height:100%; display:block; object-fit:contain; background:#000; position:relative; z-index:1; }
   .v-info { padding:20px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
   .v-title { font-size:1rem; font-weight:600; color:#d0e0ff; }
   .v-badge {
@@ -505,6 +568,20 @@
 </head>
 <body>
 
+<!-- 全站加载层 -->
+<div id="global-loader">
+  <div class="loader-content">
+    <div class="loader-anim" id="loader-anim">
+      <!-- 默认加载旋转圈 -->
+      <svg viewBox="0 0 50 50" style="animation: spin 1s linear infinite;">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(160,240,255,0.2)" stroke-width="4"></circle>
+        <circle cx="25" cy="25" r="20" fill="none" stroke="#a855f7" stroke-width="4" stroke-dasharray="31.4 125.6" stroke-linecap="round"></circle>
+      </svg>
+    </div>
+    <div class="loader-text">加载中...</div>
+  </div>
+</div>
+
 <div class="theme-bg" id="themeBg"></div>
 <div class="theme-img-bg" id="themeImgBg"></div>
 
@@ -575,7 +652,17 @@
     <div class="stat-cell"><div class="num">100+</div><div class="lbl">作品</div></div>
     <div class="stat-cell"><div class="num">10-20s</div><div class="lbl">单条时长</div></div>
     <div class="stat-cell"><div class="num">卡点</div><div class="lbl">主攻风格</div></div>
+    
+    <!-- 点赞按钮位 -->
+    <div class="like-cell" id="likeBtn">
+      <div class="like-btn" id="likeIcon">
+        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </div>
+      <div class="num" id="likeCount">0</div>
+      <div class="lbl">点赞</div>
+    </div>
   </div>
+  
   <div class="preview-section">
     <div class="sec-head">
       <div><div class="sec-label">Selected</div><div class="sec-title">精选作品</div></div>
@@ -710,7 +797,7 @@
   </div>
 </div>
 
-<!-- 关注 (包含抖音、B站、快手、小红书、视频号) -->
+<!-- 关注 -->
 <div class="page" id="page-contact">
   <div class="top-bar">
     <div class="nav-btn" id="contactBack">←</div>
@@ -724,35 +811,26 @@
     </div>
     
     <div class="contact-cards">
-      <!-- 抖音 -->
       <div class="contact-card" onclick="window.open('https://v.douyin.com/HFpSorli27k/', '_blank')">
         <div class="cc-icon">🎵</div>
         <div class="cc-name">抖音</div>
         <div class="cc-desc">点击跳转关注她</div>
       </div>
-      
-      <!-- 哔哩哔哩 -->
       <div class="contact-card" onclick="window.open('https://space.bilibili.com/3546958719355220/upload/video', '_blank')">
         <div class="cc-icon">📺</div>
         <div class="cc-name">哔哩哔哩</div>
         <div class="cc-desc">点击跳转看她的视频</div>
       </div>
-
-      <!-- 快手 (弹窗提示) -->
       <div class="contact-card" onclick="showToast()">
         <div class="cc-icon">⚡</div>
         <div class="cc-name">快手</div>
         <div class="cc-desc">暂未开放，敬请期待</div>
       </div>
-
-      <!-- 视频号 (弹窗提示) -->
       <div class="contact-card" onclick="showToast()">
         <div class="cc-icon">📹</div>
         <div class="cc-name">视频号</div>
         <div class="cc-desc">暂未开放，敬请期待</div>
       </div>
-      
-      <!-- 小红书 -->
       <div class="contact-card" onclick="window.open('https://xhslink.cn/o/9USg5aQ97qa', '_blank')">
         <div class="cc-icon">📕</div>
         <div class="cc-name">小红书</div>
@@ -799,31 +877,38 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 /* ================= 更新日志弹窗逻辑 ================= */
 const CURRENT_VERSION = 'v1.0.3';
 window.addEventListener('DOMContentLoaded', () => {
+  // 1. 动态注入 OG 标签 (SEO优化)
+  const ogContainer = document.getElementById('og-container');
+  const ogTitle = document.createElement('meta'); ogTitle.setAttribute('property', 'og:title'); ogTitle.content = '菠萝小妖💃 · 帅是常态，甜是彩蛋';
+  const ogDesc = document.createElement('meta'); ogDesc.setAttribute('property', 'og:description'); ogDesc.content = '这里是小妖的舞蹈小窝。卡点、手势舞、慢摇，随节奏落进来。';
+  const ogType = document.createElement('meta'); ogType.setAttribute('property', 'og:type'); ogType.content = 'website';
+  ogContainer.appendChild(ogTitle); ogContainer.appendChild(ogDesc); ogContainer.appendChild(ogType);
+
+  // 获取配置的OG图
+  db.from('site_images').select('*').eq('slot', 'og_image').then(({data}) => {
+    if(data && data.length > 0) {
+      const ogImg = document.createElement('meta'); ogImg.setAttribute('property', 'og:image'); ogImg.content = data[0].url;
+      ogContainer.appendChild(ogImg);
+    }
+  });
+
+  // 2. 更新日志逻辑
   const savedVersion = localStorage.getItem('site_version');
   const modal = document.getElementById('changelog-modal');
   const content = document.getElementById('modal-content');
   
   if (savedVersion !== CURRENT_VERSION) {
     modal.style.display = 'flex';
-    // 丝滑入场动画
     anime({
-      targets: content,
-      opacity: [0, 1],
-      translateY: [30, 0],
-      scale: [0.9, 1],
-      duration: 800,
-      easing: 'easeOutElastic(1, .7)'
+      targets: content, opacity: [0, 1], translateY: [30, 0], scale: [0.9, 1],
+      duration: 800, easing: 'easeOutElastic(1, .7)'
     });
   }
 
   document.getElementById('close-modal').addEventListener('click', () => {
     anime({
-      targets: content,
-      opacity: 0,
-      translateY: 20,
-      scale: 0.95,
-      duration: 300,
-      easing: 'easeInQuad',
+      targets: content, opacity: 0, translateY: 20, scale: 0.95,
+      duration: 300, easing: 'easeInQuad',
       complete: () => {
         modal.style.display = 'none';
         localStorage.setItem('site_version', CURRENT_VERSION);
@@ -836,32 +921,19 @@ window.addEventListener('DOMContentLoaded', () => {
 function showToast() {
   const toast = document.getElementById('toast');
   toast.style.display = 'block';
-  
-  // 入场
   anime({
-    targets: toast,
-    opacity: [0, 1],
-    translateY: ['-40%', '-50%'],
-    scale: [0.9, 1],
-    duration: 400,
-    easing: 'easeOutCubic'
+    targets: toast, opacity: [0, 1], translateY: ['-40%', '-50%'], scale: [0.9, 1],
+    duration: 400, easing: 'easeOutCubic'
   });
-
-  // 2秒后出场
   clearTimeout(window.toastTimer);
   window.toastTimer = setTimeout(() => {
     anime({
-      targets: toast,
-      opacity: 0,
-      translateY: '-60%',
-      scale: 0.9,
-      duration: 300,
-      easing: 'easeInCubic',
+      targets: toast, opacity: 0, translateY: '-60%', scale: 0.9,
+      duration: 300, easing: 'easeInCubic',
       complete: () => { toast.style.display = 'none'; }
     });
   }, 2000);
 }
-
 
 /* ================= 页面切换动画 ================= */
 let currentPage = 'welcome';
@@ -892,24 +964,14 @@ function switchPage(fromId, toId, direction = 'forward', done) {
 
   if (fromEl && fromEl !== toEl) {
     anime({
-      targets: fromEl,
-      opacity: [1, 0],
-      duration: 300,
-      easing: 'easeInQuad',
-      complete: () => {
-        fromEl.classList.remove('active');
-        fromEl.style.opacity = '1';
-      }
+      targets: fromEl, opacity: [1, 0], duration: 300, easing: 'easeInQuad',
+      complete: () => { fromEl.classList.remove('active'); fromEl.style.opacity = '1'; }
     });
   }
 
   anime.set(toEl, { opacity: 0.4, translateY: direction === 'forward' ? 30 : -30 });
   anime({
-    targets: toEl,
-    opacity: 1,
-    translateY: 0,
-    duration: 500,
-    easing: 'easeOutCubic',
+    targets: toEl, opacity: 1, translateY: 0, duration: 500, easing: 'easeOutCubic',
     complete: () => { if (done) done(); }
   });
 
@@ -927,12 +989,8 @@ function switchPage(fromId, toId, direction = 'forward', done) {
   if (elems.length) {
     anime.set(elems, { opacity: 0.4, translateY: 20 });
     anime({
-      targets: elems,
-      opacity: 1,
-      translateY: 0,
-      duration: 600,
-      delay: anime.stagger(50, { start: 100 }),
-      easing: 'easeOutCubic'
+      targets: elems, opacity: 1, translateY: 0, duration: 600,
+      delay: anime.stagger(50, { start: 100 }), easing: 'easeOutCubic'
     });
   }
 
@@ -989,6 +1047,7 @@ function goBack(fromId) {
   });
 }
 
+/* ================= 数据加载与呼吸灯 ================= */
 let homeLoaded = false;
 let worksLoaded = false;
 let allVideosCache = null;
@@ -1014,8 +1073,8 @@ async function ensureHomeLoaded() {
     const preview = data.slice(0, 6);
     grid.innerHTML = preview.map(v => `
       <div class="preview-card" data-url="${escapeAttr(v.url)}" data-title="${escapeAttr(v.title || '未命名视频')}">
-        <div class="pc-thumb">
-          <video playsinline preload="metadata" muted src="${escapeHtml(v.url)}"></video>
+        <div class="pc-thumb skeleton">
+          <video playsinline preload="metadata" muted src="${escapeHtml(v.url)}" onloadeddata="this.parentElement.classList.remove('skeleton')"></video>
         </div>
         <div class="pc-meta">
           <div class="pc-t">${escapeHtml(v.title || '未命名视频')}</div>
@@ -1029,8 +1088,7 @@ async function ensureHomeLoaded() {
       openDetail(card.dataset.url, card.dataset.title);
     });
     anime({
-      targets: '.preview-card',
-      opacity: [0, 1], translateY: [28, 0], scale: [0.96, 1],
+      targets: '.preview-card', opacity: [0, 1], translateY: [28, 0], scale: [0.96, 1],
       duration: 700, delay: anime.stagger(70), easing: 'easeOutCubic'
     });
   } catch (err) {
@@ -1050,8 +1108,8 @@ async function ensureWorksLoaded() {
     }
     listEl.innerHTML = data.map(v => `
       <div class="v-card" data-url="${escapeAttr(v.url)}" data-title="${escapeAttr(v.title || '未命名视频')}">
-        <div class="v-wrap">
-          <video playsinline preload="metadata" src="${escapeHtml(v.url)}" muted></video>
+        <div class="v-wrap skeleton">
+          <video playsinline preload="metadata" src="${escapeHtml(v.url)}" muted onloadeddata="this.parentElement.classList.remove('skeleton')"></video>
         </div>
         <div class="v-info">
           <span class="v-title">${escapeHtml(v.title || '未命名视频')}</span>
@@ -1065,8 +1123,7 @@ async function ensureWorksLoaded() {
       openDetail(card.dataset.url, card.dataset.title);
     });
     anime({
-      targets: '.v-card',
-      opacity: [0, 1], translateY: [32, 0], scale: [0.96, 1],
+      targets: '.v-card', opacity: [0, 1], translateY: [32, 0], scale: [0.96, 1],
       duration: 750, delay: anime.stagger(80), easing: 'easeOutCubic'
     });
   } catch (err) {
@@ -1083,12 +1140,61 @@ function openDetail(url, title) {
   pageStack.push('detail');
 }
 
+/* ================= 背景视差滚动 ================= */
+document.getElementById('page-home').addEventListener('scroll', (e) => {
+  const scrollY = e.target.scrollTop;
+  const bgText = document.querySelector('.theme-bg');
+  if (bgText) {
+    bgText.style.transform = `translateY(${scrollY * 0.2}px)`;
+  }
+});
+
+/* ================= 点赞逻辑 ================= */
+let hasLiked = localStorage.getItem('has_liked_bolo') === 'true';
+async function loadLikeCount() {
+  try {
+    const { data, error } = await db.from('site_likes').select('count').eq('id', 1).single();
+    if (!error && data) {
+      document.getElementById('likeCount').textContent = data.count;
+    }
+  } catch(e) {}
+}
+async function clickLike() {
+  if (hasLiked) return; // 只能点一次
+  const btn = document.getElementById('likeIcon');
+  btn.classList.add('liked');
+  hasLiked = true;
+  localStorage.setItem('has_liked_bolo', 'true');
+  
+  // 动画效果
+  anime({ targets: btn, scale: [1, 1.3, 1], duration: 400, easing: 'easeOutElastic(1, .5)' });
+  
+  // 数字加一
+  const countEl = document.getElementById('likeCount');
+  countEl.textContent = Number(countEl.textContent) + 1;
+
+  // 调用数据库函数
+  try { await db.rpc('increment_like'); } catch(e) { console.error(e); }
+}
+document.getElementById('likeBtn').addEventListener('click', clickLike);
+
+/* ================= 站点图片与加载动画 ================= */
 async function loadSiteImages() {
   try {
     const { data, error } = await db.from('site_images').select('*');
     if (error) throw error;
     const map = {};
     (data || []).forEach(row => { map[row.slot] = row.url; });
+
+    // 动态替换加载动画
+    if (map.loading) {
+      const animContainer = document.getElementById('loader-anim');
+      if (map.loading.match(/\.(mp4|webm|mov)/i)) {
+        animContainer.innerHTML = `<video src="${map.loading}" muted autoplay loop playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
+      } else {
+        animContainer.innerHTML = `<img src="${map.loading}">`;
+      }
+    }
 
     if (map.global_bg) {
       const el = document.getElementById('themeImgBg');
@@ -1139,8 +1245,22 @@ function escapeAttr(s) {
   return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+/* ================= 初始化 ================= */
+// 1. 先加载图片和点赞数
 loadSiteImages();
+loadLikeCount();
+if (hasLiked) {
+  document.getElementById('likeIcon').classList.add('liked');
+}
 
+// 2. 隐藏全站加载层（延迟1秒，为了展示效果）
+setTimeout(() => {
+  const loader = document.getElementById('global-loader');
+  loader.style.opacity = '0';
+  setTimeout(() => { loader.style.display = 'none'; }, 600);
+}, 1200);
+
+// 3. 欢迎页入场动画
 anime({ targets: '.avatar-big', scale: [0.6, 1], opacity: [0, 1], duration: 900, easing: 'easeOutElastic(1, .6)' });
 anime({ targets: '.w-name', opacity: [0, 1], translateY: [30, 0], duration: 800, delay: 200, easing: 'easeOutCubic' });
 anime({ targets: '.w-sig, .w-loc', opacity: [0, 1], translateY: [20, 0], duration: 700, delay: anime.stagger(120, { start: 400 }), easing: 'easeOutCubic' });

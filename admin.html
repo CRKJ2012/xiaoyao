@@ -14,7 +14,6 @@
     padding:40px 20px;
   }
   .box { width:100%; max-width:720px; }
-
   .head { margin-bottom:32px; padding-bottom:22px; border-bottom:1px solid #232a3d; }
   .head h1 { font-size:1.35rem; color:#fff; letter-spacing:1px; }
   .head .sub { margin-top:8px; font-size:.78rem; color:#6a7a99; letter-spacing:1px; line-height:1.7; }
@@ -23,7 +22,6 @@
     background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.25);
     color:#fca5a5; font-size:.7rem; letter-spacing:1px;
   }
-
   .config-block, .upload-block {
     padding:22px; border-radius:14px;
     background:#0f131c; border:1px solid #232a3d;
@@ -57,7 +55,6 @@
   button:active { transform:scale(.98); }
   button:disabled { opacity:.4; cursor:not-allowed; }
   button.secondary { background:#232a3d; }
-
   .status {
     margin-top:14px; padding:12px 14px; border-radius:9px;
     font-size:.83rem; display:none; line-height:1.7;
@@ -65,10 +62,8 @@
   .status.ok { display:block; background:rgba(52,211,153,.1); color:#6ee7b7; border:1px solid rgba(52,211,153,.25); }
   .status.err { display:block; background:rgba(248,113,113,.1); color:#fca5a5; border:1px solid rgba(248,113,113,.25); }
   .status.load { display:block; background:rgba(74,122,255,.1); color:#9bbaff; border:1px solid rgba(74,122,255,.25); }
-
   .progress { margin-top:12px; height:6px; background:#1a1f2e; border-radius:3px; overflow:hidden; display:none; }
   .progress .bar { height:100%; width:0%; background:linear-gradient(90deg,#4a7aff,#a855f7); transition:width .3s; }
-
   .list-block { margin-top:8px; }
   .list-block .lb-title { font-size:.75rem; color:#6a7a99; letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; }
   .item {
@@ -86,7 +81,6 @@
   }
   .item .del:hover { background:rgba(248,113,113,.1); }
   .empty-list { padding:30px; text-align:center; color:#3a4a66; font-size:.8rem; background:#0d111a; border:1px dashed #232a3d; border-radius:10px; }
-
   .help-box {
     margin-top:26px; padding:18px 20px; border-radius:12px;
     background:rgba(255,105,180,.05); border:1px solid rgba(255,105,180,.15);
@@ -94,11 +88,8 @@
   }
   .help-box strong { color:#ffb0d0; }
   .help-box code { background:rgba(160,240,255,.08); color:#a0f0ff; padding:1px 6px; border-radius:4px; font-size:.72rem; }
-
-  .img-preview { margin-top:8px; border-radius:8px; overflow:hidden; display:none; max-height:140px; position:relative; }
-  .img-preview img { width:100%; height:auto; display:block; max-height:140px; object-fit:cover; }
-  
-  /* 删除图片按钮 */
+  .img-preview { margin-top:8px; border-radius:8px; overflow:hidden; display:none; max-height:140px; position:relative; background:#000; }
+  .img-preview img, .img-preview video { width:100%; height:auto; display:block; max-height:140px; object-fit:contain; }
   .del-img-btn {
     position: absolute; top: 8px; right: 8px;
     background: rgba(0,0,0,.6); color: #fca5a5;
@@ -106,7 +97,7 @@
     padding: 4px 10px; border-radius: 6px;
     font-size: .7rem; cursor: pointer;
     backdrop-filter: blur(4px);
-    transition: background .2s;
+    transition: background .2s; width: auto;
   }
   .del-img-btn:hover { background: rgba(248,113,113,.2); }
 </style>
@@ -149,11 +140,23 @@
   </div>
 
   <div class="upload-block">
-    <div class="up-title">上传站点图片 / 背景</div>
+    <div class="up-title">上传站点图片 / 背景 / 配置</div>
     <p style="font-size:.75rem;color:#5a6a88;margin-bottom:18px;line-height:1.8;">
       每个位置上传后，主页面对应区域自动替换。<br>
-      点击预览图右上角的“删除”，可恢复为默认渐变背景。
+      点击预览图右上角的“删除”，可恢复默认。
     </p>
+
+    <div class="field">
+      <label>全站加载动画 <span class="hint-tag">支持图片或视频。图片会自动旋转，视频直接播放。</span></label>
+      <input type="file" id="img_loading" accept="image/*,video/*" data-slot="loading">
+      <div class="img-preview" id="preview_loading"></div>
+    </div>
+
+    <div class="field">
+      <label>微信/QQ分享封面 (OG Image) <span class="hint-tag">当你把网址发给朋友时显示的封面图</span></label>
+      <input type="file" id="img_og_image" accept="image/*" data-slot="og_image">
+      <div class="img-preview" id="preview_og_image"></div>
+    </div>
 
     <div class="field">
       <label>头像 <span class="hint-tag">显示在：欢迎页大圆头像 · 首页导航小圆标</span></label>
@@ -205,30 +208,18 @@
     <div id="videoList"><div class="empty-list">加载中...</div></div>
   </div>
 
-  <div class="help-box">
-    <strong>显示位置说明：</strong><br>
-    视频上传后会自动出现在：① 首页「精选作品」网格（最新 6 个）② 「全部作品」页竖向列表 ③ 点击后进入「作品详情」页播放。<br><br>
-    <strong>图片删除功能：</strong><br>
-    如果你想撤销某张图片，直接点击预览图右上角的“删除”。系统会自动删掉云存储里的文件，并清理数据库记录，主页面刷新后该位置自动恢复为默认渐变背景。<br><br>
-    <strong>配置说明：</strong><br>
-    URL 和 Publishable Key 只保存在你当前浏览器的 localStorage 里，不会上传到任何服务器。
-  </div>
-
 </div>
 
 <script>
 const { createClient } = supabase;
 let db = null;
-let currentConfig = { url: '', key: '' };
 
-function safeName(str) {
-  return String(str).replace(/[^a-zA-Z0-9._-]/g, '_');
-}
+function safeName(str) { return String(str).replace(/[^a-zA-Z0-9._-]/g, '_'); }
 function safeExt(file, type) {
   let ext = (file.name.split('.').pop() || '').toLowerCase();
   if (type === 'video') {
     if (!['mp4','mov','webm','ogg','m4v'].includes(ext)) ext = 'mp4';
-  } else {
+  } else if (type === 'image') {
     if (!['jpg','jpeg','png','webp','gif','bmp'].includes(ext)) ext = 'jpg';
   }
   return ext;
@@ -242,11 +233,7 @@ function loadConfig() {
   if (url && key) initClient(url, key);
 }
 function initClient(url, key) {
-  try {
-    currentConfig = { url, key };
-    db = createClient(url, key); 
-    return true; 
-  }
+  try { db = createClient(url, key); return true; }
   catch (e) { showStatus('err', '初始化失败：' + e.message); return false; }
 }
 function showStatus(type, msg) {
@@ -273,7 +260,6 @@ document.getElementById('saveConfig').onclick = () => {
   }
 };
 
-/* ---------- 视频上传 ---------- */
 document.getElementById('uploadBtn').onclick = async () => {
   if (!db) return showStatus('err', '请先保存配置');
   const title = document.getElementById('videoTitle').value.trim() || '未命名视频';
@@ -292,18 +278,14 @@ document.getElementById('uploadBtn').onclick = async () => {
   try {
     const ext = safeExt(file, 'video');
     const fileName = safeName(`${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`);
-    
     bar.style.width = '30%';
     const { error: uploadErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
     if (uploadErr) throw uploadErr;
-    
     bar.style.width = '70%';
     const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
     const publicUrl = urlData.publicUrl;
-    
     const { error: dbErr } = await db.from('videos').insert({ title, url: publicUrl });
     if (dbErr) throw dbErr;
-    
     bar.style.width = '100%';
     showStatus('ok', '上传成功！主页面刷新即可看到。');
     document.getElementById('videoTitle').value = '';
@@ -356,7 +338,6 @@ async function delVideo(id, url) {
   } catch (e) { alert('删除失败：' + e.message); }
 }
 
-/* ---------- 图片上传与删除 ---------- */
 document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
   input.addEventListener('change', async () => {
     if (!db) return showImgStatus('err', '请先保存配置');
@@ -364,12 +345,13 @@ document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
     if (!file) return;
     const slot = input.dataset.slot;
     const previewEl = document.getElementById('preview_' + slot);
-    showImgStatus('load', '正在上传图片...');
+    showImgStatus('load', '正在上传...');
 
     try {
-      const ext = safeExt(file, 'image');
+      let type = 'image';
+      if (slot === 'loading' && file.type.startsWith('video/')) type = 'video';
+      const ext = safeExt(file, type);
       const fileName = safeName(`img_${slot}_${Date.now()}.${ext}`);
-      console.log('上传图片文件名:', fileName);
 
       const { error: upErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
       if (upErr) throw upErr;
@@ -382,9 +364,10 @@ document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
       if (dbErr) throw dbErr;
       
       if (previewEl) {
+        let media = type === 'video' ? `<video src="${publicUrl}" muted autoplay loop></video>` : `<img src="${publicUrl}">`;
         previewEl.innerHTML = `
-          <button class="del-img-btn" onclick="delImage('${slot}', '${publicUrl}')">删除图片</button>
-          <img src="${publicUrl}" alt="${slot}">
+          <button class="del-img-btn" onclick="delImage('${slot}', '${publicUrl}')">删除</button>
+          ${media}
         `;
         previewEl.style.display = 'block';
       }
@@ -395,35 +378,20 @@ document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
   });
 });
 
-// 删除图片的全局函数，供按钮调用
 window.delImage = async function(slot, url) {
-  if (!confirm(`确定要删除「${slot}」的图片吗？删除后该区域会恢复默认背景。`)) return;
+  if (!confirm(`确定要删除「${slot}」吗？删除后该区域会恢复默认。`)) return;
   if (!db) return;
-  
-  showImgStatus('load', '正在删除图片...');
+  showImgStatus('load', '正在删除...');
   try {
-    // 1. 从 storage 删除文件
     const fileName = url.split('/').pop();
     await db.storage.from('videos').remove([fileName]);
-    
-    // 2. 从数据库删掉记录
     await db.from('site_images').delete().eq('slot', slot);
-    
-    // 3. 隐藏预览并清空
     const previewEl = document.getElementById('preview_' + slot);
-    if (previewEl) {
-      previewEl.innerHTML = '';
-      previewEl.style.display = 'none';
-    }
-    
-    // 清空 input 的 value，允许重新选择同一个文件
+    if (previewEl) { previewEl.innerHTML = ''; previewEl.style.display = 'none'; }
     const inputEl = document.querySelector(`input[data-slot="${slot}"]`);
     if (inputEl) inputEl.value = '';
-
-    showImgStatus('ok', `「${slot}」图片已删除，主页面刷新即可看到恢复的背景`);
-  } catch (e) {
-    showImgStatus('err', '删除失败：' + e.message);
-  }
+    showImgStatus('ok', `「${slot}」已删除，主页面刷新即可看到恢复的背景`);
+  } catch (e) { showImgStatus('err', '删除失败：' + e.message); }
 };
 
 async function loadImagePreviews() {
@@ -433,9 +401,11 @@ async function loadImagePreviews() {
     (data || []).forEach(row => {
       const previewEl = document.getElementById('preview_' + row.slot);
       if (previewEl) {
+        const isVideo = row.url.match(/\.(mp4|webm|mov)/i);
+        let media = isVideo ? `<video src="${row.url}" muted autoplay loop></video>` : `<img src="${row.url}">`;
         previewEl.innerHTML = `
-          <button class="del-img-btn" onclick="delImage('${row.slot}', '${row.url}')">删除图片</button>
-          <img src="${row.url}" alt="${row.slot}">
+          <button class="del-img-btn" onclick="delImage('${row.slot}', '${row.url}')">删除</button>
+          ${media}
         `;
         previewEl.style.display = 'block';
       }
@@ -443,14 +413,8 @@ async function loadImagePreviews() {
   } catch (e) {}
 }
 
-function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
+function esc(s) { return !s ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return !s ? '' : String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 loadConfig();
 </script>
