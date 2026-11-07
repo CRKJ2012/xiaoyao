@@ -208,9 +208,8 @@
 <!-- 主内容 -->
 <div class="container">
   
-  <!-- App 图标 -->
+  <!-- App 图标（如果你有图，替换 icon.jpg） -->
   <div class="app-icon" id="appIcon">
-    <!-- 默认读取 icon.jpg，如果没有则显示“妖”字 -->
     <img src="icon.jpg" alt="App Icon" onerror="this.style.display='none'; document.getElementById('appIconText').style.display='block';">
     <span id="appIconText" style="display:none;">妖</span>
   </div>
@@ -221,7 +220,7 @@
   <div class="app-desc">
     <p>✨ <strong>纯净无广告</strong>：专属菠萝小妖💃的舞蹈作品集。</p>
     <p>🎬 <strong>丝滑体验</strong>：卡点、手势舞、慢摇，全屏沉浸式播放，视频秒开不卡顿。</p>
-    <p>💖 <strong>独家互动</strong>：支持全站点赞，和喜欢小妖的朋友一起为她打 call。</p>
+    <p>💖 <strong>独家互动</strong>：支持全站点赞、小妖图集，和喜欢小妖的朋友一起为她打 call。</p>
     <p>📱 <strong>专属定制</strong>：专为手机端优化的 App 体验，比网页版更流畅！</p>
   </div>
 
@@ -229,21 +228,21 @@
   <div class="changelog-box">
     <div class="changelog-title">更新日志</div>
     <div class="changelog-item">
-      <div class="cl-ver">v1.0.4</div>
-      <div class="cl-text">新增全站加载动画、点赞功能；优化视频和图片加载逻辑；增加哔哩哔哩跳转。</div>
+      <div class="cl-ver">v1.0.5</div>
+      <div class="cl-text">新增小妖图集功能；新增全站公告弹窗；修复视频返回后仍在播放的问题；优化了首页布局。</div>
     </div>
     <div class="changelog-item">
-      <div class="cl-ver">v1.0.3</div>
-      <div class="cl-text">页面切换动画丝滑升级；修复部分手机标题显示问题；优化界面布局。</div>
+      <div class="cl-ver">v1.0.4</div>
+      <div class="cl-text">新增点赞功能；增加全站加载动画；优化首页和作品墙竖屏展示。</div>
     </div>
   </div>
 
-  <!-- 下载按钮 (直接指向 app.apk) -->
-  <a href="app.apk" download="小妖的小窝_v1.0.4.apk" class="download-btn" id="downloadBtn">
+  <!-- 下载按钮 (指向 app.apk) -->
+  <a href="app.apk" download="小妖的小窝_v1.0.5.apk" class="download-btn" id="downloadBtn">
     立即下载 App
   </a>
   
-  <div class="version-tag">Version 1.0.4 · Android</div>
+  <div class="version-tag">Version 1.0.5 · Android</div>
 </div>
 
 <!-- 提示框 -->
@@ -253,25 +252,12 @@
   // 初始化入场动画
   window.addEventListener('DOMContentLoaded', () => {
     anime.timeline({ easing: 'easeOutExpo' })
-      .add({
-        targets: '.app-icon',
-        scale: [0.5, 1], opacity: [0, 1], rotate: [-10, 0], duration: 1200, delay: 200
-      })
-      .add({
-        targets: '.app-title', translateY: [20, 0], opacity: [0, 1], duration: 800
-      }, '-=800')
-      .add({
-        targets: '.app-desc', translateY: [20, 0], opacity: [0, 1], duration: 800
-      }, '-=600')
-      .add({
-        targets: '.changelog-box', translateY: [20, 0], opacity: [0, 1], duration: 800
-      }, '-=600')
-      .add({
-        targets: '.download-btn', translateY: [30, 0], scale: [0.9, 1], opacity: [0, 1], duration: 1000, easing: 'easeOutElastic(1, .5)'
-      }, '-=500')
-      .add({
-        targets: '.version-tag', opacity: [0, 1], duration: 800
-      }, '-=500');
+      .add({ targets: '.app-icon', scale: [0.5, 1], opacity: [0, 1], rotate: [-10, 0], duration: 1200, delay: 200 })
+      .add({ targets: '.app-title', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=800')
+      .add({ targets: '.app-desc', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=600')
+      .add({ targets: '.changelog-box', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=600')
+      .add({ targets: '.download-btn', translateY: [30, 0], scale: [0.9, 1], opacity: [0, 1], duration: 1000, easing: 'easeOutElastic(1, .5)' }, '-=500')
+      .add({ targets: '.version-tag', opacity: [0, 1], duration: 800 }, '-=500');
   });
 
   // 环境检测
@@ -285,7 +271,7 @@
   const downloadBtn = document.getElementById('downloadBtn');
   const toast = document.getElementById('toast');
 
-  // 1. 如果在微信或QQ内
+  // 1. 如果在微信或QQ内，直接显示右上角提示遮罩
   if (isWeixin || isQQ) {
     blockMask.style.display = 'flex';
     maskText.innerText = '微信/QQ内置浏览器无法直接下载安装包。请点击右上角“...”菜单，选择“在浏览器中打开”后再点击下载。';
@@ -321,12 +307,10 @@
   function showToast(text) {
     toast.innerText = text;
     toast.style.display = 'block';
-    
     anime({
       targets: toast, opacity: [0, 1], translateY: ['-30%', '-50%'], scale: [0.9, 1],
       duration: 400, easing: 'easeOutCubic'
     });
-
     setTimeout(() => {
       anime({
         targets: toast, opacity: 0, translateY: '-70%', scale: 0.9,
