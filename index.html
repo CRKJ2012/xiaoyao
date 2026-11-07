@@ -216,6 +216,7 @@
   .btn-primary:hover { transform:translateY(-3px) scale(1.03); box-shadow:0 18px 55px rgba(168,85,247,.55); }
   .btn-ghost { background:transparent; color:#9bbaff; border:1px solid rgba(160,240,255,.25); }
   .btn-ghost:hover { background:rgba(160,240,255,.08); transform:translateY(-3px); }
+  
   .stats-band {
     max-width:1200px; margin:0 auto; width:100%;
     padding:50px 40px;
@@ -228,6 +229,7 @@
   .stat-cell { text-align:center; flex:1; min-width:120px; }
   .stat-cell .num { font-size:2.4rem; font-weight:800; color:#e0f0ff; letter-spacing:1px; }
   .stat-cell .lbl { margin-top:8px; font-size:.72rem; color:#5a6a88; letter-spacing:3px; text-transform:uppercase; }
+  
   .preview-section { max-width:1200px; margin:0 auto; width:100%; padding:80px 40px 40px; position:relative; z-index:1; }
   @media (max-width:768px) { .preview-section { padding:60px 20px 30px; } }
   .preview-section .sec-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:36px; flex-wrap:wrap; gap:12px; }
@@ -246,6 +248,7 @@
   .preview-card .pc-meta { padding:18px 20px; }
   .preview-card .pc-meta .pc-t { font-size:.95rem; color:#d0e0ff; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .preview-card .pc-meta .pc-s { margin-top:6px; font-size:.72rem; color:#5a6a88; letter-spacing:2px; }
+  
   .about-band {
     max-width:1200px; margin:0 auto; width:100%;
     padding:80px 40px;
@@ -271,6 +274,7 @@
   .style-card .sc-num { font-size:.7rem; color:#5a6a88; letter-spacing:3px; }
   .style-card .sc-title { margin-top:10px; font-size:1.05rem; color:#d0e0ff; font-weight:600; letter-spacing:1px; }
   .style-card .sc-desc { margin-top:10px; font-size:.82rem; color:#6a7a99; line-height:1.9; }
+  
   .home-footer {
     max-width:1200px; margin:0 auto; width:100%;
     padding:60px 40px 40px; text-align:center;
@@ -631,7 +635,7 @@
   </div>
 </div>
 
-<!-- 关注 -->
+<!-- 关注 (已替换为B站) -->
 <div class="page" id="page-contact">
   <div class="top-bar">
     <div class="nav-btn" id="contactBack">←</div>
@@ -644,17 +648,16 @@
       <div class="sec-label">Follow</div><div class="sec-title">关注小妖</div><div class="sec-desc">在以下平台找到她</div>
     </div>
     
-    <!-- 填充好的跳转链接 -->
     <div class="contact-cards">
       <div class="contact-card" onclick="window.open('https://v.douyin.com/HFpSorli27k/', '_blank')">
         <div class="cc-icon">🎵</div>
         <div class="cc-name">抖音</div>
         <div class="cc-desc">点击跳转关注她</div>
       </div>
-      <div class="contact-card" onclick="window.open('https://live.kuaishou.com/profile/3xjg4jyuthj3e7y?fid=1811368483&cc=share_copylink&followRefer=151&shareMethod=TOKEN&kpn=KUAISHOU&subBiz=PROFILE&shareId=19171077553262&shareToken=X7ETRDJe6dgz1m7&shareResourceType=PROFILE_OTHER&shareMode=APP&originShareId=19171077553262&appType=21&shareObjectId=1060180872&shareUrlOpened=0&timestamp=1794029946629')">
-        <div class="cc-icon">⚡</div>
-        <div class="cc-name">快手</div>
-        <div class="cc-desc">点击跳转关注她</div>
+      <div class="contact-card" onclick="window.open('https://space.bilibili.com/3546958719355220/upload/video', '_blank')">
+        <div class="cc-icon">📺</div>
+        <div class="cc-name">哔哩哔哩</div>
+        <div class="cc-desc">点击跳转看她的视频</div>
       </div>
       <div class="contact-card" onclick="window.open('https://xhslink.cn/o/9USg5aQ97qa', '_blank')">
         <div class="cc-icon">📕</div>
@@ -702,6 +705,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentPage = 'welcome';
 let pageStack = ['welcome'];
 
+/* ===== 动画核心：整页位移 + 内部元素交错浮现 ===== */
 function switchPage(fromId, toId, direction = 'forward', done) {
   const fromEl = document.getElementById('page-' + fromId);
   const toEl = document.getElementById('page-' + toId);
@@ -725,18 +729,54 @@ function switchPage(fromId, toId, direction = 'forward', done) {
   toEl.classList.add('active');
   toEl.scrollTop = 0;
 
+  // 旧页面渐隐
   if (fromEl && fromEl !== toEl) {
-    fromEl.classList.remove('active');
+    anime({
+      targets: fromEl,
+      opacity: [1, 0],
+      duration: 300,
+      easing: 'easeInQuad',
+      complete: () => {
+        fromEl.classList.remove('active');
+        fromEl.style.opacity = '1'; // 恢复原状
+      }
+    });
   }
 
-  anime.set(toEl, { translateY: direction === 'forward' ? 24 : -24 });
+  // 新页面：整体从下方轻微上浮，透明度从 0.4 到 1（保证可见）
+  anime.set(toEl, { opacity: 0.4, translateY: direction === 'forward' ? 30 : -30 });
   anime({
     targets: toEl,
+    opacity: 1,
     translateY: 0,
-    duration: 480,
+    duration: 500,
     easing: 'easeOutCubic',
     complete: () => { if (done) done(); }
   });
+
+  // 页面内部元素丝滑交错入场（不把元素藏没，只做上浮）
+  const innerSelector =
+    toId === 'home' ? '.hero-home > *, .stats-band > *, .preview-section > *, .about-band > *, .home-footer'
+    : toId === 'welcome' ? '.avatar-big, .w-name, .w-sig, .w-loc, .enter-btn'
+    : toId === 'works' ? '.section > *, .works-list > *'
+    : toId === 'about' ? '.about-page-body > *'
+    : toId === 'dance' ? '.section > *, .timeline, .teacher-card'
+    : toId === 'contact' ? '.section > *, .contact-cards > *, .site-note'
+    : toId === 'site' ? '.site-body > *'
+    : '.detail-body > *';
+  
+  const elems = toEl.querySelectorAll(innerSelector);
+  if (elems.length) {
+    anime.set(elems, { opacity: 0.4, translateY: 20 });
+    anime({
+      targets: elems,
+      opacity: 1,
+      translateY: 0,
+      duration: 600,
+      delay: anime.stagger(50, { start: 100 }), // 交错延迟
+      easing: 'easeOutCubic'
+    });
+  }
 
   currentPage = toId;
 }
