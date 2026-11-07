@@ -407,8 +407,8 @@
   #page-contact { padding-bottom:80px; position:relative; }
   .contact-body { max-width:1000px; margin:40px auto 0; width:100%; padding:0 40px; position:relative; z-index:1; }
   @media (max-width:768px) { .contact-body { padding:0 20px; } }
-  .contact-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:24px; margin-top:36px; }
-  @media (min-width:1024px) { .contact-cards { grid-template-columns:repeat(3,1fr); } }
+  .contact-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:24px; margin-top:36px; }
+  @media (min-width:1024px) { .contact-cards { grid-template-columns:repeat(4,1fr); } }
   .contact-card {
     padding:36px 28px; border-radius:22px; text-align:center;
     background:rgba(255,255,255,.03);
@@ -443,12 +443,87 @@
   .site-contact .sc-title2 { font-size:.7rem; color:#5a6a88; letter-spacing:4px; text-transform:uppercase; margin-bottom:18px; }
   .site-contact .sc-line { font-size:.95rem; color:#d0e0ff; line-height:2.4; letter-spacing:.5px; }
   .site-contact .sc-line span { color:#7a8aaa; margin-right:10px; }
+
+  /* ===== 自定义 Toast 提示框 ===== */
+  #toast {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(15, 19, 28, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(160, 240, 255, 0.2);
+    color: #e0f0ff;
+    padding: 16px 32px; border-radius: 16px;
+    font-size: 0.95rem; letter-spacing: 2px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.2);
+    z-index: 9999; display: none; opacity: 0; pointer-events: none;
+    text-align: center;
+  }
+
+  /* ===== 首次进入更新日志弹窗 ===== */
+  #changelog-modal {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-content {
+    background: linear-gradient(145deg, #0f131c, #080a10);
+    border: 1px solid rgba(160, 240, 255, 0.15);
+    border-radius: 24px; padding: 40px 36px;
+    max-width: 420px; width: 100%;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(168, 85, 247, 0.15);
+    position: relative; opacity: 0; transform: translateY(20px) scale(0.95);
+  }
+  .modal-content::before {
+    content: ''; position: absolute; inset: 0; border-radius: 24px;
+    background: radial-gradient(circle at top left, rgba(168, 85, 247, 0.1), transparent 60%);
+    pointer-events: none;
+  }
+  .modal-title {
+    font-size: 1.4rem; font-weight: 800; letter-spacing: 2px;
+    background: linear-gradient(135deg, #e0f0ff, #ff9ef0);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 20px; position: relative; z-index: 1;
+  }
+  .modal-body {
+    font-size: 0.9rem; color: #8899bb; line-height: 1.8; letter-spacing: 0.5px;
+    position: relative; z-index: 1;
+  }
+  .modal-body p { margin-bottom: 10px; }
+  .modal-body strong { color: #9bbaff; font-weight: 500; }
+  .modal-btn {
+    margin-top: 30px; width: 100%; padding: 14px; border: none; border-radius: 12px;
+    background: linear-gradient(135deg, #4a7aff, #a855f7, #ec4899);
+    color: #fff; font-size: 0.95rem; font-weight: 600; letter-spacing: 2px;
+    cursor: pointer; position: relative; z-index: 1;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+  }
+  .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(168, 85, 247, 0.5); }
 </style>
 </head>
 <body>
 
 <div class="theme-bg" id="themeBg"></div>
 <div class="theme-img-bg" id="themeImgBg"></div>
+
+<!-- 首次进入更新日志弹窗 -->
+<div id="changelog-modal">
+  <div class="modal-content" id="modal-content">
+    <h2 class="modal-title">✨ 更新日志 v1.0.3</h2>
+    <div class="modal-body">
+      <p>· 新增了 <strong>哔哩哔哩</strong> 官方跳转入口</p>
+      <p>· 页面切换和元素入场动画升级，更加丝滑流畅</p>
+      <p>· 修复了部分手机浏览器标题无法显示的兼容性问题</p>
+      <p>· 优化了图片和视频在云端存储的加载逻辑</p>
+    </div>
+    <button class="modal-btn" id="close-modal">开启小窝</button>
+  </div>
+</div>
+
+<!-- 自定义 Toast (用于快手/视频号点击) -->
+<div id="toast">功能暂未开放，敬请期待！</div>
 
 <!-- 欢迎页 -->
 <div class="page active" id="page-welcome">
@@ -635,7 +710,7 @@
   </div>
 </div>
 
-<!-- 关注 (已替换为B站) -->
+<!-- 关注 (包含抖音、B站、快手、小红书、视频号) -->
 <div class="page" id="page-contact">
   <div class="top-bar">
     <div class="nav-btn" id="contactBack">←</div>
@@ -649,16 +724,35 @@
     </div>
     
     <div class="contact-cards">
+      <!-- 抖音 -->
       <div class="contact-card" onclick="window.open('https://v.douyin.com/HFpSorli27k/', '_blank')">
         <div class="cc-icon">🎵</div>
         <div class="cc-name">抖音</div>
         <div class="cc-desc">点击跳转关注她</div>
       </div>
+      
+      <!-- 哔哩哔哩 -->
       <div class="contact-card" onclick="window.open('https://space.bilibili.com/3546958719355220/upload/video', '_blank')">
         <div class="cc-icon">📺</div>
         <div class="cc-name">哔哩哔哩</div>
         <div class="cc-desc">点击跳转看她的视频</div>
       </div>
+
+      <!-- 快手 (弹窗提示) -->
+      <div class="contact-card" onclick="showToast()">
+        <div class="cc-icon">⚡</div>
+        <div class="cc-name">快手</div>
+        <div class="cc-desc">暂未开放，敬请期待</div>
+      </div>
+
+      <!-- 视频号 (弹窗提示) -->
+      <div class="contact-card" onclick="showToast()">
+        <div class="cc-icon">📹</div>
+        <div class="cc-name">视频号</div>
+        <div class="cc-desc">暂未开放，敬请期待</div>
+      </div>
+      
+      <!-- 小红书 -->
       <div class="contact-card" onclick="window.open('https://xhslink.cn/o/9USg5aQ97qa', '_blank')">
         <div class="cc-icon">📕</div>
         <div class="cc-name">小红书</div>
@@ -702,10 +796,77 @@ const SUPABASE_KEY = 'sb_publishable_8NhMWO807rD7xSVVyrPrcQ_1tpznF4I';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/* ================= 更新日志弹窗逻辑 ================= */
+const CURRENT_VERSION = 'v1.0.3';
+window.addEventListener('DOMContentLoaded', () => {
+  const savedVersion = localStorage.getItem('site_version');
+  const modal = document.getElementById('changelog-modal');
+  const content = document.getElementById('modal-content');
+  
+  if (savedVersion !== CURRENT_VERSION) {
+    modal.style.display = 'flex';
+    // 丝滑入场动画
+    anime({
+      targets: content,
+      opacity: [0, 1],
+      translateY: [30, 0],
+      scale: [0.9, 1],
+      duration: 800,
+      easing: 'easeOutElastic(1, .7)'
+    });
+  }
+
+  document.getElementById('close-modal').addEventListener('click', () => {
+    anime({
+      targets: content,
+      opacity: 0,
+      translateY: 20,
+      scale: 0.95,
+      duration: 300,
+      easing: 'easeInQuad',
+      complete: () => {
+        modal.style.display = 'none';
+        localStorage.setItem('site_version', CURRENT_VERSION);
+      }
+    });
+  });
+});
+
+/* ================= 快手/视频号 Toast 提示 ================= */
+function showToast() {
+  const toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  
+  // 入场
+  anime({
+    targets: toast,
+    opacity: [0, 1],
+    translateY: ['-40%', '-50%'],
+    scale: [0.9, 1],
+    duration: 400,
+    easing: 'easeOutCubic'
+  });
+
+  // 2秒后出场
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => {
+    anime({
+      targets: toast,
+      opacity: 0,
+      translateY: '-60%',
+      scale: 0.9,
+      duration: 300,
+      easing: 'easeInCubic',
+      complete: () => { toast.style.display = 'none'; }
+    });
+  }, 2000);
+}
+
+
+/* ================= 页面切换动画 ================= */
 let currentPage = 'welcome';
 let pageStack = ['welcome'];
 
-/* ===== 动画核心：整页位移 + 内部元素交错浮现 ===== */
 function switchPage(fromId, toId, direction = 'forward', done) {
   const fromEl = document.getElementById('page-' + fromId);
   const toEl = document.getElementById('page-' + toId);
@@ -729,7 +890,6 @@ function switchPage(fromId, toId, direction = 'forward', done) {
   toEl.classList.add('active');
   toEl.scrollTop = 0;
 
-  // 旧页面渐隐
   if (fromEl && fromEl !== toEl) {
     anime({
       targets: fromEl,
@@ -738,12 +898,11 @@ function switchPage(fromId, toId, direction = 'forward', done) {
       easing: 'easeInQuad',
       complete: () => {
         fromEl.classList.remove('active');
-        fromEl.style.opacity = '1'; // 恢复原状
+        fromEl.style.opacity = '1';
       }
     });
   }
 
-  // 新页面：整体从下方轻微上浮，透明度从 0.4 到 1（保证可见）
   anime.set(toEl, { opacity: 0.4, translateY: direction === 'forward' ? 30 : -30 });
   anime({
     targets: toEl,
@@ -754,7 +913,6 @@ function switchPage(fromId, toId, direction = 'forward', done) {
     complete: () => { if (done) done(); }
   });
 
-  // 页面内部元素丝滑交错入场（不把元素藏没，只做上浮）
   const innerSelector =
     toId === 'home' ? '.hero-home > *, .stats-band > *, .preview-section > *, .about-band > *, .home-footer'
     : toId === 'welcome' ? '.avatar-big, .w-name, .w-sig, .w-loc, .enter-btn'
@@ -773,7 +931,7 @@ function switchPage(fromId, toId, direction = 'forward', done) {
       opacity: 1,
       translateY: 0,
       duration: 600,
-      delay: anime.stagger(50, { start: 100 }), // 交错延迟
+      delay: anime.stagger(50, { start: 100 }),
       easing: 'easeOutCubic'
     });
   }
