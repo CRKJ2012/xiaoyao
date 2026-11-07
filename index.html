@@ -184,7 +184,6 @@
   .hero-home .hero-eyebrow { font-size:.75rem; color:#9bbaff; letter-spacing:6px; text-transform:uppercase; margin-bottom:20px; }
   .hero-home .welcome-line { font-size:clamp(1.1rem,3.5vw,1.6rem); color:#8899bb; letter-spacing:10px; font-weight:300; margin-bottom:20px; }
   
-  /* 【终极暴力修复】这里强制加高、加背景，绝不可能被吃掉 */
   .hero-home .nest-title {
     font-family:'ZCOOL KuaiLe', 'Ma Shan Zheng', cursive;
     font-size:clamp(3rem,10vw,6rem);
@@ -192,7 +191,7 @@
     color: #ff9ef0; 
     text-shadow: 0 0 30px rgba(255,158,240,.4), 0 0 10px rgba(160,240,255,.6);
     display: block !important;
-    min-height: 120px; /* 强制撑开高度 */
+    min-height: 120px;
     margin: 20px 0 40px 0;
   }
   
@@ -644,11 +643,26 @@
     <div class="section" style="padding:50px 0 0; text-align:center;">
       <div class="sec-label">Follow</div><div class="sec-title">关注小妖</div><div class="sec-desc">在以下平台找到她</div>
     </div>
+    
+    <!-- 填充好的跳转链接 -->
     <div class="contact-cards">
-      <div class="contact-card" onclick="alert('把这里换成她的抖音主页链接')"><div class="cc-icon">🎵</div><div class="cc-name">抖音</div><div class="cc-desc">搜索“菠萝小妖💃”</div></div>
-      <div class="contact-card" onclick="alert('把这里换成她的快手主页链接')"><div class="cc-icon">⚡</div><div class="cc-name">快手</div><div class="cc-desc">搜索“菠萝小妖”</div></div>
-      <div class="contact-card" onclick="alert('把这里换成她的小红书主页链接')"><div class="cc-icon">📕</div><div class="cc-name">小红书</div><div class="cc-desc">搜索“菠萝小妖”</div></div>
+      <div class="contact-card" onclick="window.open('https://v.douyin.com/HFpSorli27k/', '_blank')">
+        <div class="cc-icon">🎵</div>
+        <div class="cc-name">抖音</div>
+        <div class="cc-desc">点击跳转关注她</div>
+      </div>
+      <div class="contact-card" onclick="window.open('https://live.kuaishou.com/profile/3xjg4jyuthj3e7y?fid=1811368483&cc=share_copylink&followRefer=151&shareMethod=TOKEN&kpn=KUAISHOU&subBiz=PROFILE&shareId=19171077553262&shareToken=X7ETRDJe6dgz1m7&shareResourceType=PROFILE_OTHER&shareMode=APP&originShareId=19171077553262&appType=21&shareObjectId=1060180872&shareUrlOpened=0&timestamp=1794029946629')">
+        <div class="cc-icon">⚡</div>
+        <div class="cc-name">快手</div>
+        <div class="cc-desc">点击跳转关注她</div>
+      </div>
+      <div class="contact-card" onclick="window.open('https://xhslink.cn/o/9USg5aQ97qa', '_blank')">
+        <div class="cc-icon">📕</div>
+        <div class="cc-name">小红书</div>
+        <div class="cc-desc">点击跳转关注她</div>
+      </div>
     </div>
+    
     <div class="site-note">
       <strong>说明：</strong>本页面为粉丝向作品展示站，所有视频版权归原作者所有。视频展示需获得本人授权，请勿用于商业用途。
     </div>
