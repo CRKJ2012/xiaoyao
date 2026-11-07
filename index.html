@@ -19,34 +19,56 @@
     overflow-x:hidden;
   }
   
-  /* 全站加载层 */
+  /* ===== 全站加载层 ===== */
   #global-loader {
     position: fixed; inset: 0; z-index: 99999;
     background: #06080e;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.8s ease;
   }
   .loader-content {
-    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
   }
   .loader-anim {
-    width: 64px; height: 64px;
     display: flex; align-items: center; justify-content: center;
   }
-  .loader-anim img {
-    width: 100%; height: 100%; object-fit: contain;
+  /* 图片加载：完美圆形，旋转 */
+  .loader-anim.is-image {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 2px solid rgba(160, 240, 255, 0.3);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+    overflow: hidden;
+  }
+  .loader-anim.is-image img {
+    width: 100%; height: 100%; object-fit: cover;
     animation: spin 2s linear infinite;
   }
-  .loader-anim video {
+  /* 视频加载：加大尺寸，圆角矩形，不旋转 */
+  .loader-anim.is-video {
+    width: 160px; height: 90px;
+    border-radius: 16px;
+    border: 1px solid rgba(160, 240, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    overflow: hidden;
+    background: #000;
+  }
+  .loader-anim.is-video video {
     width: 100%; height: 100%; object-fit: contain;
   }
+  /* 默认加载：圈圈 */
+  .loader-anim.is-default {
+    width: 64px; height: 64px;
+  }
+  
   .loader-text {
-    font-size: .85rem; color: #8899bb; letter-spacing: 4px;
+    font-size: .9rem; color: #8899bb; letter-spacing: 6px;
     animation: pulse 1.5s infinite alternate;
+    font-weight: 300;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes pulse { 0% { opacity: 0.4; } 100% { opacity: 1; } }
+  @keyframes pulse { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
   /* 呼吸灯效果 */
   .skeleton {
@@ -62,7 +84,7 @@
     100% { transform: translateX(100%); }
   }
 
-  /* 背景视差 */
+  /* 背景 */
   .theme-bg {
     position:fixed; inset:0; z-index:0; pointer-events:none;
     background:
@@ -79,7 +101,6 @@
     color:rgba(160,240,255,.025);
     white-space:nowrap; pointer-events:none;
     font-family:'Ma Shan Zheng', 'PingFang SC', cursive;
-    will-change: transform;
   }
   .theme-img-bg {
     position:fixed; inset:0; z-index:0; pointer-events:none;
@@ -507,6 +528,25 @@
   .site-contact .sc-line { font-size:.95rem; color:#d0e0ff; line-height:2.4; letter-spacing:.5px; }
   .site-contact .sc-line span { color:#7a8aaa; margin-right:10px; }
 
+  /* 关于本站-更新日志 */
+  .changelog-block {
+    margin-top: 20px;
+    border-left: 2px solid rgba(168, 85, 247, 0.4);
+    padding-left: 20px;
+  }
+  .changelog-item { margin-bottom: 24px; }
+  .changelog-item:last-child { margin-bottom: 0; }
+  .changelog-ver {
+    font-size: 1rem; font-weight: 700; color: #ff9ef0;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .changelog-ver span {
+    font-size: 0.7rem; font-weight: 400; color: #5a6a88; letter-spacing: 1px;
+  }
+  .changelog-text {
+    margin-top: 8px; font-size: 0.85rem; color: #8899bb; line-height: 1.8;
+  }
+
   /* ===== 自定义 Toast 提示框 ===== */
   #toast {
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -571,8 +611,8 @@
 <!-- 全站加载层 -->
 <div id="global-loader">
   <div class="loader-content">
-    <div class="loader-anim" id="loader-anim">
-      <!-- 默认加载旋转圈 -->
+    <!-- 默认的圈圈，等待图片/视频加载后会被 JS 替换类名和内容 -->
+    <div class="loader-anim is-default" id="loader-anim">
       <svg viewBox="0 0 50 50" style="animation: spin 1s linear infinite;">
         <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(160,240,255,0.2)" stroke-width="4"></circle>
         <circle cx="25" cy="25" r="20" fill="none" stroke="#a855f7" stroke-width="4" stroke-dasharray="31.4 125.6" stroke-linecap="round"></circle>
@@ -588,12 +628,12 @@
 <!-- 首次进入更新日志弹窗 -->
 <div id="changelog-modal">
   <div class="modal-content" id="modal-content">
-    <h2 class="modal-title">✨ 更新日志 v1.0.3</h2>
+    <h2 class="modal-title">✨ 更新日志 v1.0.4</h2>
     <div class="modal-body">
-      <p>· 新增了 <strong>哔哩哔哩</strong> 官方跳转入口</p>
-      <p>· 页面切换和元素入场动画升级，更加丝滑流畅</p>
-      <p>· 修复了部分手机浏览器标题无法显示的兼容性问题</p>
-      <p>· 优化了图片和视频在云端存储的加载逻辑</p>
+      <p>· 加载动画支持图片旋转与视频播放</p>
+      <p>· 强制 5 秒加载逻辑，确保所有资源加载完毕</p>
+      <p>· 新增顶部点赞功能，全站共享数据</p>
+      <p>· 优化了更新日志的展示与归档位置</p>
     </div>
     <button class="modal-btn" id="close-modal">开启小窝</button>
   </div>
@@ -856,6 +896,31 @@
     <div class="site-block"><div class="sb-label">Why</div><div class="sb-text">做这个站，是因为喜欢她的舞蹈，也想有一个干净、专注的地方，把她的作品按顺序整理起来，方便随时回看。</div></div>
     <div class="site-block"><div class="sb-label">Copyright</div><div class="sb-text">所有视频、图片、文字内容的版权均归<strong>原作者（菠萝小妖）</strong>所有。本站不拥有这些内容的版权，仅作展示。如需使用，请联系本人获得授权。</div></div>
     <div class="site-block"><div class="sb-label">Tech</div><div class="sb-text">前端：纯 HTML + CSS + JavaScript + Anime.js 动画库。<br>存储：Supabase Storage + Database。<br>托管：GitHub Pages。</div></div>
+    
+    <!-- 这里加入了更新日志 -->
+    <div class="site-block">
+      <div class="sb-label">更新日志</div>
+      <div class="changelog-block">
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.0.4 <span>最新</span></div>
+          <div class="changelog-text">
+            · 加载动画支持图片旋转与视频播放<br>
+            · 强制 5 秒加载逻辑，确保所有资源加载完毕<br>
+            · 新增顶部点赞功能，全站共享数据<br>
+            · 优化了更新日志的展示与归档位置
+          </div>
+        </div>
+        <div class="changelog-item" style="opacity: 0.6; margin-top: 20px;">
+          <div class="changelog-ver">v1.0.3 <span>历史版本</span></div>
+          <div class="changelog-text">
+            · 新增了哔哩哔哩官方跳转入口<br>
+            · 页面切换和元素入场动画升级，更加丝滑流畅<br>
+            · 修复了部分手机浏览器标题无法显示的兼容性问题
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="site-contact">
       <div class="sc-title2">Contact</div>
       <div class="sc-line"><span>E-mail</span> 3831926820@qq.com</div>
@@ -874,13 +939,15 @@ const SUPABASE_KEY = 'sb_publishable_8NhMWO807rD7xSVVyrPrcQ_1tpznF4I';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ================= 更新日志弹窗逻辑 ================= */
-const CURRENT_VERSION = 'v1.0.3';
-window.addEventListener('DOMContentLoaded', () => {
+/* ================= 统一初始化与 5 秒强制加载 ================= */
+const CURRENT_VERSION = 'v1.0.4';
+const loadStartTime = Date.now();
+
+window.addEventListener('DOMContentLoaded', async () => {
   // 1. 动态注入 OG 标签 (SEO优化)
   const ogContainer = document.getElementById('og-container');
-  const ogTitle = document.createElement('meta'); ogTitle.setAttribute('property', 'og:title'); ogTitle.content = '菠萝小妖💃 · 帅是常态，甜是彩蛋';
-  const ogDesc = document.createElement('meta'); ogDesc.setAttribute('property', 'og:description'); ogDesc.content = '这里是小妖的舞蹈小窝。卡点、手势舞、慢摇，随节奏落进来。';
+  const ogTitle = document.createElement('meta'); ogTitle.setAttribute('property', 'og:title'); ogTitle.content = '帅是常态，甜是彩蛋，随机切换';
+  const ogDesc = document.createElement('meta'); ogDesc.setAttribute('property', 'og:description'); ogDesc.content = '这里是小妖的舞蹈小窝。喜欢就进来看看吧！♥️';
   const ogType = document.createElement('meta'); ogType.setAttribute('property', 'og:type'); ogType.content = 'website';
   ogContainer.appendChild(ogTitle); ogContainer.appendChild(ogDesc); ogContainer.appendChild(ogType);
 
@@ -892,7 +959,35 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 2. 更新日志逻辑
+  // 2. 并发执行所有加载任务
+  await Promise.all([
+    loadSiteImages(), // 加载站点图、加载动画
+    loadLikeCount(),  // 加载点赞数
+  ]);
+
+  // 3. 强制等待最少 5 秒
+  const elapsedTime = Date.now() - loadStartTime;
+  const minLoadTime = 5000;
+  const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+
+  setTimeout(() => {
+    // 隐藏加载层
+    const loader = document.getElementById('global-loader');
+    loader.style.opacity = '0';
+    setTimeout(() => { loader.style.display = 'none'; }, 800);
+
+    // 检查更新日志并弹窗
+    checkChangelog();
+
+    // 初始入场动画
+    anime({ targets: '.avatar-big', scale: [0.6, 1], opacity: [0, 1], duration: 900, easing: 'easeOutElastic(1, .6)' });
+    anime({ targets: '.w-name', opacity: [0, 1], translateY: [30, 0], duration: 800, delay: 200, easing: 'easeOutCubic' });
+    anime({ targets: '.w-sig, .w-loc', opacity: [0, 1], translateY: [20, 0], duration: 700, delay: anime.stagger(120, { start: 400 }), easing: 'easeOutCubic' });
+    anime({ targets: '.enter-btn', opacity: [0, 1], translateY: [30, 0], scale: [0.9, 1], duration: 800, delay: 700, easing: 'easeOutElastic(1, .5)' });
+  }, remainingTime);
+});
+
+function checkChangelog() {
   const savedVersion = localStorage.getItem('site_version');
   const modal = document.getElementById('changelog-modal');
   const content = document.getElementById('modal-content');
@@ -915,7 +1010,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-});
+}
 
 /* ================= 快手/视频号 Toast 提示 ================= */
 function showToast() {
@@ -1140,15 +1235,6 @@ function openDetail(url, title) {
   pageStack.push('detail');
 }
 
-/* ================= 背景视差滚动 ================= */
-document.getElementById('page-home').addEventListener('scroll', (e) => {
-  const scrollY = e.target.scrollTop;
-  const bgText = document.querySelector('.theme-bg');
-  if (bgText) {
-    bgText.style.transform = `translateY(${scrollY * 0.2}px)`;
-  }
-});
-
 /* ================= 点赞逻辑 ================= */
 let hasLiked = localStorage.getItem('has_liked_bolo') === 'true';
 async function loadLikeCount() {
@@ -1160,23 +1246,23 @@ async function loadLikeCount() {
   } catch(e) {}
 }
 async function clickLike() {
-  if (hasLiked) return; // 只能点一次
+  if (hasLiked) return;
   const btn = document.getElementById('likeIcon');
   btn.classList.add('liked');
   hasLiked = true;
   localStorage.setItem('has_liked_bolo', 'true');
   
-  // 动画效果
   anime({ targets: btn, scale: [1, 1.3, 1], duration: 400, easing: 'easeOutElastic(1, .5)' });
   
-  // 数字加一
   const countEl = document.getElementById('likeCount');
   countEl.textContent = Number(countEl.textContent) + 1;
 
-  // 调用数据库函数
   try { await db.rpc('increment_like'); } catch(e) { console.error(e); }
 }
 document.getElementById('likeBtn').addEventListener('click', clickLike);
+if (hasLiked) {
+  document.getElementById('likeIcon').classList.add('liked');
+}
 
 /* ================= 站点图片与加载动画 ================= */
 async function loadSiteImages() {
@@ -1190,8 +1276,12 @@ async function loadSiteImages() {
     if (map.loading) {
       const animContainer = document.getElementById('loader-anim');
       if (map.loading.match(/\.(mp4|webm|mov)/i)) {
-        animContainer.innerHTML = `<video src="${map.loading}" muted autoplay loop playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
+        // 视频
+        animContainer.className = 'loader-anim is-video';
+        animContainer.innerHTML = `<video src="${map.loading}" muted autoplay loop playsinline></video>`;
       } else {
+        // 图片
+        animContainer.className = 'loader-anim is-image';
         animContainer.innerHTML = `<img src="${map.loading}">`;
       }
     }
@@ -1244,27 +1334,6 @@ function escapeAttr(s) {
   if (!s) return '';
   return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-
-/* ================= 初始化 ================= */
-// 1. 先加载图片和点赞数
-loadSiteImages();
-loadLikeCount();
-if (hasLiked) {
-  document.getElementById('likeIcon').classList.add('liked');
-}
-
-// 2. 隐藏全站加载层（延迟1秒，为了展示效果）
-setTimeout(() => {
-  const loader = document.getElementById('global-loader');
-  loader.style.opacity = '0';
-  setTimeout(() => { loader.style.display = 'none'; }, 600);
-}, 1200);
-
-// 3. 欢迎页入场动画
-anime({ targets: '.avatar-big', scale: [0.6, 1], opacity: [0, 1], duration: 900, easing: 'easeOutElastic(1, .6)' });
-anime({ targets: '.w-name', opacity: [0, 1], translateY: [30, 0], duration: 800, delay: 200, easing: 'easeOutCubic' });
-anime({ targets: '.w-sig, .w-loc', opacity: [0, 1], translateY: [20, 0], duration: 700, delay: anime.stagger(120, { start: 400 }), easing: 'easeOutCubic' });
-anime({ targets: '.enter-btn', opacity: [0, 1], translateY: [30, 0], scale: [0.9, 1], duration: 800, delay: 700, easing: 'easeOutElastic(1, .5)' });
 </script>
 </body>
 </html>

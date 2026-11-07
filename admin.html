@@ -88,6 +88,7 @@
   }
   .help-box strong { color:#ffb0d0; }
   .help-box code { background:rgba(160,240,255,.08); color:#a0f0ff; padding:1px 6px; border-radius:4px; font-size:.72rem; }
+  
   .img-preview { margin-top:8px; border-radius:8px; overflow:hidden; display:none; max-height:140px; position:relative; background:#000; }
   .img-preview img, .img-preview video { width:100%; height:auto; display:block; max-height:140px; object-fit:contain; }
   .del-img-btn {
@@ -147,13 +148,13 @@
     </p>
 
     <div class="field">
-      <label>全站加载动画 <span class="hint-tag">支持图片或视频。图片会自动旋转，视频直接播放。</span></label>
+      <label>全站加载动画 <span class="hint-tag">支持图片或视频。图片会自动变成圆形旋转，视频会放大播放。</span></label>
       <input type="file" id="img_loading" accept="image/*,video/*" data-slot="loading">
       <div class="img-preview" id="preview_loading"></div>
     </div>
 
     <div class="field">
-      <label>微信/QQ分享封面 (OG Image) <span class="hint-tag">当你把网址发给朋友时显示的封面图</span></label>
+      <label>微信/QQ分享封面 (OG Image) <span class="hint-tag">发给朋友时显示的封面图（建议方图或横图）</span></label>
       <input type="file" id="img_og_image" accept="image/*" data-slot="og_image">
       <div class="img-preview" id="preview_og_image"></div>
     </div>
@@ -206,6 +207,15 @@
   <div class="list-block">
     <div class="lb-title">已上传视频</div>
     <div id="videoList"><div class="empty-list">加载中...</div></div>
+  </div>
+
+  <div class="help-box">
+    <strong>显示位置说明：</strong><br>
+    视频上传后会自动出现在：① 首页「精选作品」网格（最新 6 个）② 「全部作品」页竖向列表 ③ 点击后进入「作品详情」页播放。<br><br>
+    <strong>加载动画特别说明：</strong><br>
+    如果你在“全站加载动画”传的是图片，主页会把它裁剪成完美的圆形并在里面旋转；如果传的是视频，主页会取消圆形，放大为圆角矩形直接播放（看清动作）。<br><br>
+    <strong>配置说明：</strong><br>
+    URL 和 Publishable Key 只保存在你当前浏览器的 localStorage 里，不会上传到任何服务器。
   </div>
 
 </div>
