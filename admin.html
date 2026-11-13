@@ -3,481 +3,521 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>小妖小窝 · 后台上传</title>
+<title>小妖の小窝 - 后台管理</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#0b0d15; color:#e0e0e0; font-family:system-ui,-apple-system,'PingFang SC',sans-serif; min-height:100vh; display:flex; justify-content:center; padding:40px 20px; }
-  .box { width:100%; max-width:720px; }
-  .head { margin-bottom:32px; padding-bottom:22px; border-bottom:1px solid #232a3d; }
-  .head h1 { font-size:1.35rem; color:#fff; letter-spacing:1px; }
-  .head .sub { margin-top:8px; font-size:.78rem; color:#6a7a99; letter-spacing:1px; line-height:1.7; }
-  .head .warn { display:inline-block; margin-top:10px; padding:4px 12px; border-radius:20px; background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.25); color:#fca5a5; font-size:.7rem; letter-spacing:1px; }
-  .config-block, .upload-block, .list-block { padding:22px; border-radius:14px; background:#0f131c; border:1px solid #232a3d; margin-bottom:28px; }
-  .cfg-title, .up-title, .lb-title { font-size:.75rem; color:#9bbaff; letter-spacing:2px; text-transform:uppercase; margin-bottom:18px; }
-  .field { margin-bottom:18px; }
-  label { display:block; font-size:.78rem; color:#8899bb; margin-bottom:8px; letter-spacing:1px; }
-  label .hint-tag { font-size:.68rem; color:#5a6a88; margin-left:6px; }
-  input[type="text"], input[type="password"], input[type="file"], textarea { width:100%; padding:12px 14px; border-radius:9px; background:#141824; border:1px solid #232a3d; color:#e0e0e0; font-size:.88rem; outline:none; font-family:inherit; }
-  input:focus, textarea:focus { border-color:#4a7aff; }
-  input[type="file"] { padding:10px; color:#8899bb; }
-  button { width:100%; padding:14px; border:none; border-radius:9px; background:linear-gradient(135deg,#4a7aff,#a855f7); color:#fff; font-size:.9rem; font-weight:600; cursor:pointer; font-family:inherit; }
-  button:hover { opacity:.9; }
-  button.secondary { background:#232a3d; }
-  .status { margin-top:14px; padding:12px 14px; border-radius:9px; font-size:.83rem; display:none; }
-  .status.ok { display:block; background:rgba(52,211,153,.1); color:#6ee7b7; border:1px solid rgba(52,211,153,.25); }
-  .status.err { display:block; background:rgba(248,113,113,.1); color:#fca5a5; border:1px solid rgba(248,113,113,.25); }
-  .status.load { display:block; background:rgba(74,122,255,.1); color:#9bbaff; border:1px solid rgba(74,122,255,.25); }
-  .progress { margin-top:12px; height:6px; background:#1a1f2e; border-radius:3px; overflow:hidden; display:none; }
-  .progress .bar { height:100%; width:0%; background:linear-gradient(90deg,#4a7aff,#a855f7); transition:width .3s; }
-  .item { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#141824; border:1px solid #232a3d; border-radius:10px; margin-bottom:10px; gap:12px; }
-  .item-info { flex:1; min-width:0; }
-  .item-name { font-size:.86rem; color:#c0d0ee; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .item-loc { margin-top:4px; font-size:.68rem; color:#5a6a88; }
-  .item .del { background:transparent; border:1px solid #4a1f2e; color:#fca5a5; width:auto; padding:6px 12px; font-size:.72rem; border-radius:8px; flex-shrink:0; }
-  .empty-list { padding:30px; text-align:center; color:#3a4a66; font-size:.8rem; background:#0d111a; border:1px dashed #232a3d; border-radius:10px; }
-  .img-preview { margin-top:8px; border-radius:8px; overflow:hidden; display:none; max-height:140px; position:relative; background:#000; }
-  .img-preview img, .img-preview video { width:100%; height:auto; display:block; max-height:140px; object-fit:contain; }
-  .del-img-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.6); color: #fca5a5; border: 1px solid rgba(248,113,113,.4); padding: 4px 10px; border-radius: 6px; font-size: .7rem; cursor: pointer; backdrop-filter: blur(4px); width:auto; }
-  .feedback-item { padding:16px; background:#141824; border:1px solid #232a3d; border-radius:10px; margin-bottom:10px; font-size:.85rem; color:#c0d0ee; line-height:1.7; }
-  .feedback-meta { display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:.7rem; color:#5a6a88; border-top:1px solid rgba(255,255,255,.05); padding-top:8px; }
-  .del-fb-btn { background:transparent; border:1px solid #4a1f2e; color:#fca5a5; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:.7rem; margin-left:10px; width:auto; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing: antialiased; }
+  body { 
+    background-color: #000000; 
+    color: #f5f5f7; 
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh; display: flex; justify-content: center; align-items: flex-start;
+    padding: 60px 20px;
+  }
+
+  /* 登录界面 (极简风) */
+  #login-screen { width: 100%; max-width: 340px; margin-top: 10vh; display: none; }
+  .login-title { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; text-align: center; margin-bottom: 30px; }
   
-  /* 图集网格样式 */
-  .gallery-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:10px; }
-  .gallery-item { position:relative; aspect-ratio: 1 / 1; border-radius:8px; overflow:hidden; background:#000; }
-  .gallery-item img { width:100%; height:100%; object-fit:cover; }
-  .gallery-item .del-gallery { position:absolute; top:4px; right:4px; background:rgba(0,0,0,.7); color:#fca5a5; border:none; padding:4px 8px; border-radius:4px; font-size:.6rem; cursor:pointer; }
+  .input-wrap { background: #1c1c1e; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+  .input-row { display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #333; }
+  .input-row:last-child { border-bottom: none; }
+  .input-row input { 
+    width: 100%; height: 52px; background: transparent; border: none; outline: none; 
+    color: #fff; font-size: 16px; 
+  }
+  .input-row input::placeholder { color: #666; }
+  
+  .btn-login { 
+    width: 100%; height: 50px; border-radius: 12px; background: #007aff; color: #fff; 
+    font-size: 16px; font-weight: 600; border: none; cursor: pointer; transition: 0.2s;
+  }
+  .btn-login:active { background: #005bb5; transform: scale(0.98); }
+  .error-msg { color: #ff453a; font-size: 13px; text-align: center; margin-top: 16px; display: none; }
+
+  /* 主界面 */
+  #admin-screen { width: 100%; max-width: 600px; display: none; }
+  
+  /* 顶部导航 */
+  .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; padding-bottom: 16px; border-bottom: 1px solid #333; }
+  .header-left { display: flex; flex-direction: column; gap: 4px; }
+  .title { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+  .role-tag { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  
+  .btn-super { 
+    background: transparent; border: 1px solid #333; color: #aaa; 
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: 0.2s; 
+  }
+  .btn-super.active { border-color: #ff9f0a; color: #ff9f0a; }
+
+  /* 模块分组 */
+  .section { margin-bottom: 40px; }
+  .section-title { font-size: 13px; color: #888; font-weight: 500; margin-bottom: 12px; padding-left: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  /* 列表式面板 (iOS 风格) */
+  .list-group { background: #1c1c1e; border-radius: 16px; overflow: hidden; }
+  .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #333; transition: 0.2s; }
+  .list-item:last-child { border-bottom: none; }
+  .item-info { display: flex; flex-direction: column; gap: 4px; }
+  .item-name { font-size: 15px; color: #fff; font-weight: 500; }
+  .item-sub { font-size: 12px; color: #888; }
+  
+  /* 按钮样式 */
+  .btn-action { 
+    background: #2c2c2e; color: #fff; border: none; padding: 10px 20px; 
+    border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s;
+  }
+  .btn-action:active { background: #3a3a3c; }
+  .btn-action.primary { background: #007aff; }
+  .btn-action.primary:active { background: #005bb5; }
+  .btn-danger { background: transparent; color: #ff453a; border: none; font-size: 14px; cursor: pointer; }
+
+  /* 表单 */
+  .form-group { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .form-input { 
+    width: 100%; background: #2c2c2e; border: 1px solid transparent; border-radius: 10px; 
+    padding: 14px; color: #fff; font-size: 15px; outline: none; transition: 0.2s;
+  }
+  .form-input:focus { border-color: #007aff; background: #1c1c1e; }
+  textarea.form-input { resize: none; min-height: 80px; }
+  input[type="file"] { font-size: 13px; color: #aaa; padding: 10px 0; }
+
+  /* 网格图片 */
+  .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; padding: 16px; background: #1c1c1e; border-radius: 16px; margin-top: 10px; }
+  .grid-img-box { position: relative; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; background: #000; }
+  .grid-img-box img, .grid-img-box video { width: 100%; height: 100%; object-fit: cover; }
+  .grid-del { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 11px; cursor: pointer; backdrop-filter: blur(4px); }
+
+  /* 状态提示 */
+  .status { padding: 12px 16px; font-size: 13px; display: none; }
+  .status.ok { display: block; color: #32d74b; }
+  .status.err { display: block; color: #ff453a; }
+  .status.load { display: block; color: #0a84ff; }
+
+  /* 视频全屏预览弹窗 */
+  #video-modal {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    display: none; align-items: center; justify-content: center; opacity: 0;
+  }
+  .video-container { width: 100%; max-width: 800px; position: relative; padding: 0 20px; }
+  .video-container video { width: 100%; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: block; }
+  .close-modal { position: absolute; top: -40px; right: 20px; color: #fff; font-size: 24px; cursor: pointer; background: none; border: none; }
 </style>
 </head>
 <body>
-<div class="box">
 
-  <div class="head">
-    <h1>🍍 小妖小窝 · 后台</h1>
-    <p class="sub">本文件仅在你自己的电脑上运行，用来上传/管理视频和图片。<br>不要上传到 GitHub，不要发给别人。</p>
-    <span class="warn">⚠️ 含 Secret Key，仅本地使用</span>
-  </div>
-
-  <div class="config-block">
-    <div class="cfg-title">Supabase 配置</div>
-    <div class="field">
-      <label>Project URL</label>
-      <input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co">
-    </div>
-    <div class="field">
-      <label>Publishable Key <span class="hint-tag">填 Publishable Key (sb_publishable_...)</span></label>
-      <input type="password" id="sbKey" placeholder="粘贴 Publishable Key">
-    </div>
-    <button id="saveConfig" class="secondary">保存配置</button>
-  </div>
-
-  <!-- 公告 -->
-  <div class="upload-block" style="border: 1px solid rgba(168,85,247,0.3);">
-    <div class="up-title" style="color:#ff9ef0;">📢 全站公告（显示在每次App启动）</div>
-    <div class="field">
-      <label>公告内容 <span class="hint-tag">留空则不弹窗。支持换行。</span></label>
-      <textarea id="noticeText" rows="3" placeholder="   "></textarea>
-    </div>
-    <button id="saveNoticeBtn" style="background:linear-gradient(135deg,#ff9ef0,#a855f7);">保存并发布公告</button>
-    <div class="status" id="noticeStatus"></div>
-  </div>
-
-  <!-- 视频上传 -->
-  <div class="upload-block">
-    <div class="up-title">上传新视频</div>
-    <div class="field">
-      <label>视频标题 <span class="hint-tag">显示在：首页精选卡片 / 作品墙列表</span></label>
-      <input type="text" id="videoTitle" placeholder="例如：新年祝福">
-    </div>
-    <div class="field">
-      <label>视频文件 <span class="hint-tag">mp4，建议 50MB 以内</span></label>
-      <input type="file" id="videoFile" accept="video/mp4,video/*">
-    </div>
-    <button id="uploadBtn">上传视频</button>
-    <div class="progress" id="progress"><div class="bar" id="progressBar"></div></div>
-    <div class="status" id="status"></div>
-  </div>
-
-  <!-- 图集上传 -->
-  <div class="upload-block">
-    <div class="up-title">上传小妖图集 <span class="hint-tag" style="text-transform:none;">支持多选，自动排队上传</span></div>
-    <div class="field">
-      <label>选择图片 (可多选)</label>
-      <input type="file" id="galleryFiles" accept="image/*" multiple>
-    </div>
-    <button id="uploadGalleryBtn">批量上传图片</button>
-    <div class="progress" id="galleryProgress"><div class="bar" id="galleryProgressBar"></div></div>
-    <div class="status" id="galleryStatus"></div>
-    
-    <div class="gallery-grid" id="galleryGrid" style="margin-top:20px;"></div>
-  </div>
-
-  <!-- 站点图片 -->
-  <div class="upload-block">
-    <div class="up-title">上传站点图片 / 背景 / 配置</div>
-    <div class="field">
-      <label>全站加载动画</label>
-      <input type="file" id="img_loading" accept="image/*,video/*" data-slot="loading">
-      <div class="img-preview" id="preview_loading"></div>
-    </div>
-    <div class="field">
-      <label>微信/QQ分享封面 (OG Image)</label>
-      <input type="file" id="img_og_image" accept="image/*" data-slot="og_image">
-      <div class="img-preview" id="preview_og_image"></div>
-    </div>
-    <div class="field">
-      <label>头像</label>
-      <input type="file" id="img_avatar" accept="image/*" data-slot="avatar">
-      <div class="img-preview" id="preview_avatar"></div>
-    </div>
-    <div class="field">
-      <label>全局背景</label>
-      <input type="file" id="img_global_bg" accept="image/*" data-slot="global_bg">
-      <div class="img-preview" id="preview_global_bg"></div>
-    </div>
-    <div class="field">
-      <label>首页背景</label>
-      <input type="file" id="img_home_bg" accept="image/*" data-slot="home_bg">
-      <div class="img-preview" id="preview_home_bg"></div>
-    </div>
-    <div class="field">
-      <label>作品墙背景</label>
-      <input type="file" id="img_works_bg" accept="image/*" data-slot="works_bg">
-      <div class="img-preview" id="preview_works_bg"></div>
-    </div>
-    <div class="field">
-      <label>关于她背景</label>
-      <input type="file" id="img_about_bg" accept="image/*" data-slot="about_bg">
-      <div class="img-preview" id="preview_about_bg"></div>
-    </div>
-    <div class="field">
-      <label>学舞背景</label>
-      <input type="file" id="img_dance_bg" accept="image/*" data-slot="dance_bg">
-      <div class="img-preview" id="preview_dance_bg"></div>
-    </div>
-    <div class="field">
-      <label>关注页背景</label>
-      <input type="file" id="img_contact_bg" accept="image/*" data-slot="contact_bg">
-      <div class="img-preview" id="preview_contact_bg"></div>
-    </div>
-    <div class="status" id="imgStatus"></div>
-  </div>
-
-  <div class="list-block">
-    <div class="lb-title">已上传视频</div>
-    <div id="videoList"><div class="empty-list">加载中...</div></div>
-  </div>
-
-  <div class="list-block">
-    <div class="lb-title">用户反馈</div>
-    <div id="feedbackList"><div class="empty-list">加载中...</div></div>
+<!-- 视频预览弹窗 -->
+<div id="video-modal">
+  <div class="video-container">
+    <button class="close-modal" onclick="closeVideoModal()">✕</button>
+    <video id="modal-video" controls></video>
   </div>
 </div>
 
+<!-- 登录界面 -->
+<div id="login-screen">
+  <h1 class="login-title">小妖の小窝</h1>
+  <div class="input-wrap">
+    <div class="input-row">
+      <input type="text" id="loginUser" placeholder="账号">
+    </div>
+    <div class="input-row">
+      <input type="password" id="loginPass" placeholder="密码">
+    </div>
+  </div>
+  <button class="btn-login" onclick="handleLogin()">登录</button>
+  <div class="error-msg" id="loginErr">账号或密码错误</div>
+</div>
+
+<!-- 主管理界面 -->
+<div id="admin-screen">
+  <div class="header">
+    <div class="header-left">
+      <span class="title">控制台</span>
+      <span class="role-tag" id="role-badge">普通管理员</span>
+    </div>
+    <button class="btn-super" id="super-btn" onclick="toggleSuper()">二级权限</button>
+  </div>
+
+  <!-- 二级管理员专属 -->
+  <div id="super-zone" style="display: none;">
+    <div class="section">
+      <div class="section-title">全站公告</div>
+      <div class="list-group">
+        <div class="form-group">
+          <textarea id="noticeText" class="form-input" placeholder="输入公告内容..."></textarea>
+          <button class="btn-action primary" onclick="saveNotice()" style="width: 100px; align-self: flex-end;">保存</button>
+        </div>
+        <div class="status" id="noticeStatus"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">站点外观设置</div>
+      <div class="list-group">
+        <div class="form-group">
+          <span style="font-size: 13px; color: #888;">全站加载动画</span>
+          <input type="file" id="img_loading" accept="image/*,video/*" data-slot="loading">
+          <div class="image-grid" id="grid_loading" style="padding: 8px; margin-top: 8px;"></div>
+        </div>
+        <div class="form-group" style="border-top: 1px solid #333;">
+          <span style="font-size: 13px; color: #888;">全局背景</span>
+          <input type="file" id="img_global_bg" accept="image/*" data-slot="global_bg">
+          <div class="image-grid" id="grid_global_bg" style="padding: 8px; margin-top: 8px;"></div>
+        </div>
+        <div class="form-group" style="border-top: 1px solid #333;">
+          <span style="font-size: 13px; color: #888;">首页背景</span>
+          <input type="file" id="img_home_bg" accept="image/*" data-slot="home_bg">
+          <div class="image-grid" id="grid_home_bg" style="padding: 8px; margin-top: 8px;"></div>
+        </div>
+        <div class="status" id="imgStatus"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 视频管理 -->
+  <div class="section">
+    <div class="section-title">视频管理</div>
+    <div class="list-group" style="margin-bottom: 16px;">
+      <div class="form-group">
+        <input type="text" id="videoTitle" class="form-input" placeholder="视频标题">
+        <input type="file" id="videoFile" accept="video/mp4,video/*">
+        <button class="btn-action primary" onclick="uploadVideo()" id="uploadVideoBtn" style="margin-top: 8px;">上传视频</button>
+      </div>
+      <div class="status" id="videoStatus"></div>
+    </div>
+    
+    <!-- 视频列表 -->
+    <div class="list-group" id="videoList"></div>
+  </div>
+
+  <!-- 图集管理 -->
+  <div class="section">
+    <div class="section-title">图集管理</div>
+    <div class="list-group" style="margin-bottom: 16px;">
+      <div class="form-group">
+        <input type="file" id="galleryFiles" accept="image/*" multiple>
+        <button class="btn-action primary" onclick="uploadGallery()" id="uploadGalleryBtn" style="margin-top: 8px;">批量上传图片</button>
+      </div>
+      <div class="status" id="galleryStatus"></div>
+    </div>
+    
+    <!-- 图片列表 -->
+    <div class="image-grid" id="galleryGrid" style="margin-top: 0;"></div>
+  </div>
+
+</div>
+
 <script>
+/* ================= 配置区 ================= */
+const SUPABASE_URL = 'https://iadmzoukavnahjliorgq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8NhMWO807rD7xSVVyrPrcQ_1tpznF4I';
+
+const ADMIN_USER = 'lhp';
+const ADMIN_PASS = '0117';
+const SUPER_PASS = 'ycx625110482';
+/* ========================================= */
+
 const { createClient } = supabase;
-let db = null;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+let isSuper = localStorage.getItem('is_super') === 'true';
 
-function safeName(str) { return String(str).replace(/[^a-zA-Z0-9._-]/g, '_'); }
-function safeExt(file, type) {
-  let ext = (file.name.split('.').pop() || '').toLowerCase();
-  if (type === 'video') { if (!['mp4','mov','webm','ogg','m4v'].includes(ext)) ext = 'mp4'; }
-  else if (type === 'image') { if (!['jpg','jpeg','png','webp','gif','bmp'].includes(ext)) ext = 'jpg'; }
-  return ext;
-}
+// UI 动画入场
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('login-screen').style.display = 'block';
+  anime({
+    targets: '#login-screen', opacity: [0, 1], translateY: [20, 0],
+    duration: 600, easing: 'easeOutQuart'
+  });
+});
 
-function loadConfig() {
-  const url = localStorage.getItem('sb_url') || '';
-  const key = localStorage.getItem('sb_key') || '';
-  document.getElementById('sbUrl').value = url;
-  document.getElementById('sbKey').value = key;
-  if (url && key) initClient(url, key);
-}
-function initClient(url, key) {
-  try { db = createClient(url, key); return true; }
-  catch (e) { showStatus('err', '初始化失败'); return false; }
-}
-function showStatus(type, msg) { const el = document.getElementById('status'); el.className = 'status ' + type; el.textContent = msg; }
-function showImgStatus(type, msg) { const el = document.getElementById('imgStatus'); el.className = 'status ' + type; el.textContent = msg; }
-function showNoticeStatus(type, msg) { const el = document.getElementById('noticeStatus'); el.className = 'status ' + type; el.textContent = msg; }
-function showGalleryStatus(type, msg) { const el = document.getElementById('galleryStatus'); el.className = 'status ' + type; el.textContent = msg; }
-
-document.getElementById('saveConfig').onclick = () => {
-  const url = document.getElementById('sbUrl').value.trim();
-  const key = document.getElementById('sbKey').value.trim();
-  if (!url || !key) return showStatus('err', '请填写 URL 和 Key');
-  localStorage.setItem('sb_url', url);
-  localStorage.setItem('sb_key', key);
-  if (initClient(url, key)) {
-    showStatus('ok', '配置已保存，可以上传了');
-    loadList(); loadImagePreviews(); loadFeedbacks(); loadNotice(); loadGallery();
+function handleLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    anime({
+      targets: '#login-screen', opacity: 0, duration: 300, easing: 'easeInQuad',
+      complete: () => {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        initAdmin();
+      }
+    });
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    anime({ targets: '#login-screen', translateX: [-10, 10, -10, 10, 0], duration: 400, easing: 'easeInOutQuad' });
   }
-};
+}
 
-// 图集批量上传
-document.getElementById('uploadGalleryBtn').onclick = async () => {
-  if (!db) return showGalleryStatus('err', '请先保存配置');
+function initAdmin() {
+  // 丝滑擦除入场
+  anime({
+    targets: '.section', opacity: [0, 1], translateY: [15, 0],
+    duration: 500, delay: anime.stagger(100), easing: 'easeOutCubic'
+  });
+  
+  if (isSuper) enableSuperMode();
+  loadVideos();
+  loadGallery();
+}
+
+function toggleSuper() {
+  if (isSuper) {
+    isSuper = false;
+    localStorage.removeItem('is_super');
+    document.getElementById('role-badge').innerText = '普通管理员';
+    document.getElementById('super-btn').classList.remove('active');
+    document.getElementById('super-btn').innerText = '二级权限';
+    document.getElementById('super-zone').style.display = 'none';
+  } else {
+    const pwd = prompt('请输入二级管理员密码：');
+    if (pwd === SUPER_PASS) {
+      isSuper = true;
+      localStorage.setItem('is_super', 'true');
+      enableSuperMode(true);
+    } else if (pwd !== null) {
+      alert('密码错误！');
+    }
+  }
+}
+
+function enableSuperMode(animate = false) {
+  document.getElementById('role-badge').innerText = '高级管理员';
+  document.getElementById('super-btn').classList.add('active');
+  document.getElementById('super-btn').innerText = '退出二级';
+  
+  const zone = document.getElementById('super-zone');
+  zone.style.display = 'block';
+  
+  if (animate) {
+    anime({
+      targets: '#super-zone .section', opacity: [0, 1], translateY: [10, 0],
+      duration: 400, delay: anime.stagger(100), easing: 'easeOutCubic'
+    });
+    loadSiteImages();
+    loadNotice();
+  }
+}
+
+// 视频预览弹窗
+function openVideoModal(url) {
+  const modal = document.getElementById('video-modal');
+  const video = document.getElementById('modal-video');
+  video.src = url;
+  modal.style.display = 'flex';
+  anime({ targets: modal, opacity: [0, 1], duration: 300 });
+  video.play();
+}
+function closeVideoModal() {
+  const modal = document.getElementById('video-modal');
+  const video = document.getElementById('modal-video');
+  video.pause();
+  video.src = '';
+  anime({ targets: modal, opacity: 0, duration: 200, complete: () => { modal.style.display = 'none'; }});
+}
+
+// 视频上传
+async function uploadVideo() {
+  const title = document.getElementById('videoTitle').value.trim() || '未命名视频';
+  const file = document.getElementById('videoFile').files[0];
+  if (!file) return showStatus('videoStatus', 'err', '请选择视频文件');
+  
+  const btn = document.getElementById('uploadVideoBtn');
+  btn.disabled = true;
+  showStatus('videoStatus', 'load', '正在上传...');
+  
+  try {
+    const ext = file.name.split('.').pop() || 'mp4';
+    const fileName = `vid_${Date.now()}.${ext}`;
+    
+    const { error: upErr } = await db.storage.from('videos').upload(fileName, file);
+    if (upErr) throw upErr;
+    
+    const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
+    await db.from('videos').insert({ title, url: urlData.publicUrl });
+    
+    showStatus('videoStatus', 'ok', '上传成功');
+    document.getElementById('videoTitle').value = '';
+    document.getElementById('videoFile').value = '';
+    loadVideos();
+  } catch (e) {
+    showStatus('videoStatus', 'err', '失败: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function loadVideos() {
+  const list = document.getElementById('videoList');
+  const { data } = await db.from('videos').select('*').order('created_at', { ascending: false });
+  if (!data) return;
+  
+  if (data.length === 0) {
+    list.innerHTML = '<div style="padding: 20px; text-align: center; color: #666; font-size: 14px;">暂无视频</div>';
+    return;
+  }
+  
+  list.innerHTML = data.map(v => `
+    <div class="list-item">
+      <div class="item-info" onclick="openVideoModal('${escAttr(v.url)}')" style="cursor: pointer;">
+        <span class="item-name" style="color: #0a84ff;">${esc(v.title)}</span>
+        <span class="item-sub">点击预览</span>
+      </div>
+      <button class="btn-danger" onclick="delVideo(${v.id}, '${escAttr(v.url)}')">删除</button>
+    </div>
+  `).join('');
+}
+
+async function delVideo(id, url) {
+  if (!confirm('确定删除？')) return;
+  const fileName = url.split('/').pop();
+  await db.storage.from('videos').remove([fileName]);
+  await db.from('videos').delete().eq('id', id);
+  loadVideos();
+}
+
+// 图集上传
+async function uploadGallery() {
   const files = document.getElementById('galleryFiles').files;
-  if (!files || files.length === 0) return showGalleryStatus('err', '请选择图片');
+  if (!files || files.length === 0) return showStatus('galleryStatus', 'err', '请选择图片');
   
   const btn = document.getElementById('uploadGalleryBtn');
   btn.disabled = true;
-  const progress = document.getElementById('galleryProgress');
-  const bar = document.getElementById('galleryProgressBar');
-  progress.style.display = 'block';
-  
-  let successCount = 0;
+  let success = 0;
   
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    showGalleryStatus('load', `正在上传第 ${i+1}/${files.length} 张...`);
-    bar.style.width = `${((i + 1) / files.length) * 100}%`;
+    showStatus('galleryStatus', 'load', `上传中 ${i+1}/${files.length}...`);
     
     try {
-      const ext = safeExt(file, 'image');
-      const fileName = safeName(`gallery_${Date.now()}_${i}.${ext}`);
-      const { error: upErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
+      const ext = file.name.split('.').pop() || 'jpg';
+      const fileName = `gal_${Date.now()}_${i}.${ext}`;
+      const { error: upErr } = await db.storage.from('videos').upload(fileName, file);
       if (upErr) throw upErr;
       
       const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
       await db.from('gallery').insert({ url: urlData.publicUrl });
-      successCount++;
-    } catch (e) {
-      console.error('单张上传失败', e);
-    }
+      success++;
+    } catch(e) { console.error(e); }
   }
   
-  showGalleryStatus('ok', `成功上传 ${successCount} 张图片`);
+  showStatus('galleryStatus', 'ok', `成功上传 ${success} 张`);
   document.getElementById('galleryFiles').value = '';
   btn.disabled = false;
-  setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 1500);
   loadGallery();
-};
+}
 
 async function loadGallery() {
-  if (!db) return;
   const grid = document.getElementById('galleryGrid');
-  grid.innerHTML = '<div style="color:#5a6a88; font-size:.8rem; grid-column:1/-1;">加载中...</div>';
-  try {
-    const { data, error } = await db.from('gallery').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    if (!data || data.length === 0) { grid.innerHTML = '<div style="color:#5a6a88; font-size:.8rem; grid-column:1/-1;">暂无图片</div>'; return; }
-    
-    grid.innerHTML = data.map(g => `
-      <div class="gallery-item">
-        <img src="${g.url}">
-        <button class="del-gallery" onclick="delGallery(${g.id}, '${g.url}')">删除</button>
-      </div>
-    `).join('');
-  } catch(e) { grid.innerHTML = '<div style="color:#fca5a5; font-size:.8rem; grid-column:1/-1;">加载失败</div>'; }
+  const { data } = await db.from('gallery').select('*').order('created_at', { ascending: false });
+  if (!data || data.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1; padding: 20px; text-align: center; color: #666; font-size: 14px;">暂无图片</div>';
+    return;
+  }
+  
+  grid.innerHTML = data.map(g => `
+    <div class="grid-img-box">
+      <img src="${g.url}">
+      <button class="grid-del" onclick="delGallery(${g.id}, '${g.url}')">✕</button>
+    </div>
+  `).join('');
 }
 
-window.delGallery = async function(id, url) {
-  if (!confirm('确定删除这张图片吗？')) return;
-  try {
-    const fileName = url.split('/').pop();
-    await db.storage.from('videos').remove([fileName]);
-    await db.from('gallery').delete().eq('id', id);
-    loadGallery();
-  } catch(e) { alert('删除失败：' + e.message); }
-};
+async function delGallery(id, url) {
+  if (!confirm('删除此图片？')) return;
+  const fileName = url.split('/').pop();
+  await db.storage.from('videos').remove([fileName]);
+  await db.from('gallery').delete().eq('id', id);
+  loadGallery();
+}
 
-// 其他逻辑保持不变
-document.getElementById('saveNoticeBtn').onclick = async () => {
-  if (!db) return showNoticeStatus('err', '请先保存配置');
+// 超管配置
+async function saveNotice() {
+  if (!isSuper) return;
   const text = document.getElementById('noticeText').value.trim();
-  showNoticeStatus('load', '正在保存公告...');
+  showStatus('noticeStatus', 'load', '保存中...');
   try {
-    if (!text) {
-      await db.from('site_images').delete().eq('slot', 'notice');
-      showNoticeStatus('ok', '公告已清空');
-    } else {
-      await db.from('site_images').delete().eq('slot', 'notice');
-      const { error } = await db.from('site_images').insert({ slot: 'notice', url: text });
-      if (error) throw error;
-      showNoticeStatus('ok', '公告已发布！');
-    }
-  } catch (e) { showNoticeStatus('err', '操作失败：' + e.message); }
-};
+    await db.from('site_images').delete().eq('slot', 'notice');
+    if (text) await db.from('site_images').insert({ slot: 'notice', url: text });
+    showStatus('noticeStatus', 'ok', '公告已更新');
+  } catch(e) { showStatus('noticeStatus', 'err', '保存失败'); }
+}
 
 async function loadNotice() {
-  if (!db) return;
-  try {
-    const { data } = await db.from('site_images').select('url').eq('slot', 'notice').single();
-    document.getElementById('noticeText').value = (data && data.url) ? data.url : '';
-  } catch (e) {}
-}
-
-document.getElementById('uploadBtn').onclick = async () => {
-  if (!db) return showStatus('err', '请先保存配置');
-  const title = document.getElementById('videoTitle').value.trim() || '未命名视频';
-  const fileInput = document.getElementById('videoFile');
-  const file = fileInput.files[0];
-  if (!file) return showStatus('err', '请选择视频文件');
-  const btn = document.getElementById('uploadBtn');
-  btn.disabled = true;
-  const progress = document.getElementById('progress');
-  const bar = document.getElementById('progressBar');
-  progress.style.display = 'block';
-  bar.style.width = '10%';
-  showStatus('load', '正在上传视频文件...');
-  try {
-    const ext = safeExt(file, 'video');
-    const fileName = safeName(`${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`);
-    bar.style.width = '30%';
-    const { error: uploadErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
-    if (uploadErr) throw uploadErr;
-    bar.style.width = '70%';
-    const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
-    const publicUrl = urlData.publicUrl;
-    const { error: dbErr } = await db.from('videos').insert({ title, url: publicUrl });
-    if (dbErr) throw dbErr;
-    bar.style.width = '100%';
-    showStatus('ok', '上传成功！');
-    document.getElementById('videoTitle').value = '';
-    fileInput.value = '';
-    loadList();
-  } catch (e) {
-    showStatus('err', '上传失败：' + (e.message || JSON.stringify(e)));
-    bar.style.width = '0%';
-  } finally {
-    btn.disabled = false;
-    setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 1600);
-  }
-};
-
-async function loadList() {
-  if (!db) return;
-  const listEl = document.getElementById('videoList');
-  listEl.innerHTML = '<div class="empty-list">加载中...</div>';
-  try {
-    const { data, error } = await db.from('videos').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    if (!data || data.length === 0) { listEl.innerHTML = '<div class="empty-list">还没有视频</div>'; return; }
-    listEl.innerHTML = data.map(v => `
-      <div class="item">
-        <div class="item-info">
-          <div class="item-name">${esc(v.title || '未命名视频')}</div>
-          <div class="item-loc">→ 显示于：首页精选 · 作品墙 · 详情页</div>
-        </div>
-        <button class="del" data-id="${v.id}" data-url="${escAttr(v.url)}">删除</button>
-      </div>
-    `).join('');
-    listEl.querySelectorAll('.del').forEach(btn => {
-      btn.addEventListener('click', () => delVideo(Number(btn.dataset.id), btn.dataset.url));
-    });
-  } catch (e) { listEl.innerHTML = `<div class="empty-list" style="color:#fca5a5;">加载失败：${esc(e.message)}</div>`; }
-}
-
-async function delVideo(id, url) {
-  if (!confirm('确定删除这个视频吗？')) return;
-  try {
-    const fileName = url.split('/').pop();
-    await db.storage.from('videos').remove([fileName]);
-    await db.from('videos').delete().eq('id', id);
-    loadList();
-  } catch (e) { alert('删除失败：' + e.message); }
+  const { data } = await db.from('site_images').select('url').eq('slot', 'notice').single();
+  document.getElementById('noticeText').value = (data && data.url) ? data.url : '';
 }
 
 document.querySelectorAll('input[type="file"][data-slot]').forEach(input => {
   input.addEventListener('change', async () => {
-    if (!db) return showImgStatus('err', '请先保存配置');
+    if (!isSuper) return alert('需要二级权限');
     const file = input.files[0];
     if (!file) return;
     const slot = input.dataset.slot;
-    const previewEl = document.getElementById('preview_' + slot);
-    showImgStatus('load', '正在上传...');
+    showStatus('imgStatus', 'load', '上传中...');
+    
     try {
-      let type = 'image';
-      if (slot === 'loading' && file.type.startsWith('video/')) type = 'video';
-      const ext = safeExt(file, type);
-      const fileName = safeName(`img_${slot}_${Date.now()}.${ext}`);
-      const { error: upErr } = await db.storage.from('videos').upload(fileName, file, { cacheControl: '3600', upsert: false });
+      const ext = file.name.split('.').pop();
+      const fileName = `bg_${slot}_${Date.now()}.${ext}`;
+      
+      const { error: upErr } = await db.storage.from('videos').upload(fileName, file);
       if (upErr) throw upErr;
+      
       const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
-      const publicUrl = urlData.publicUrl;
       await db.from('site_images').delete().eq('slot', slot);
-      const { error: dbErr } = await db.from('site_images').insert({ slot, url: publicUrl });
-      if (dbErr) throw dbErr;
-      if (previewEl) {
-        let media = type === 'video' ? `<video src="${publicUrl}" muted autoplay loop></video>` : `<img src="${publicUrl}">`;
-        previewEl.innerHTML = `<button class="del-img-btn" onclick="delImage('${slot}', '${publicUrl}')">删除</button>${media}`;
-        previewEl.style.display = 'block';
-      }
-      showImgStatus('ok', `「${slot}」上传成功`);
-    } catch (e) { showImgStatus('err', '上传失败：' + (e.message || JSON.stringify(e))); }
+      await db.from('site_images').insert({ slot, url: urlData.publicUrl });
+      
+      showStatus('imgStatus', 'ok', '上传成功');
+      loadSiteImages();
+    } catch(e) { showStatus('imgStatus', 'err', '失败: ' + e.message); }
   });
 });
 
-window.delImage = async function(slot, url) {
-  if (!confirm(`确定要删除「${slot}」吗？`)) return;
-  if (!db) return;
-  showImgStatus('load', '正在删除...');
-  try {
-    const fileName = url.split('/').pop();
-    await db.storage.from('videos').remove([fileName]);
-    await db.from('site_images').delete().eq('slot', slot);
-    const previewEl = document.getElementById('preview_' + slot);
-    if (previewEl) { previewEl.innerHTML = ''; previewEl.style.display = 'none'; }
-    const inputEl = document.querySelector(`input[data-slot="${slot}"]`);
-    if (inputEl) inputEl.value = '';
-    showImgStatus('ok', `「${slot}」已删除`);
-  } catch (e) { showImgStatus('err', '删除失败：' + e.message); }
-};
-
-async function loadImagePreviews() {
-  if (!db) return;
-  try {
-    const { data } = await db.from('site_images').select('*');
-    (data || []).forEach(row => {
-      const previewEl = document.getElementById('preview_' + row.slot);
-      if (previewEl && row.slot !== 'notice') {
-        const isVideo = row.url.match(/\.(mp4|webm|mov)/i);
-        let media = isVideo ? `<video src="${row.url}" muted autoplay loop></video>` : `<img src="${row.url}">`;
-        previewEl.innerHTML = `<button class="del-img-btn" onclick="delImage('${row.slot}', '${row.url}')">删除</button>${media}`;
-        previewEl.style.display = 'block';
-      }
-    });
-  } catch (e) {}
-}
-
-async function loadFeedbacks() {
-  if (!db) return;
-  const el = document.getElementById('feedbackList');
-  el.innerHTML = '<div class="empty-list">加载中...</div>';
-  try {
-    const { data, error } = await db.from('feedbacks').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    if (!data || data.length === 0) { el.innerHTML = '<div class="empty-list">暂无反馈</div>'; return; }
-    el.innerHTML = data.map(f => `
-      <div class="feedback-item">
-        <div>${esc(f.content).replace(/\n/g, '<br>')}</div>
-        <div class="feedback-meta">
-          <span>联系: ${esc(f.contact || '无')}</span>
-          <div>
-            <span>${new Date(f.created_at).toLocaleString()}</span>
-            <button class="del-fb-btn" onclick="delFeedback(${f.id})">删除</button>
-          </div>
+async function loadSiteImages() {
+  const { data } = await db.from('site_images').select('*');
+  if (!data) return;
+  const map = {};
+  data.forEach(d => map[d.slot] = d.url);
+  
+  ['loading', 'global_bg', 'home_bg'].forEach(slot => {
+    const el = document.getElementById(`grid_${slot}`);
+    if (!el) return;
+    if (map[slot]) {
+      const isVid = map[slot].match(/\.(mp4|webm|mov)/i);
+      el.innerHTML = `
+        <div class="grid-img-box" style="grid-column:1/-1; height:80px; aspect-ratio:auto; border-radius:6px;">
+          ${isVid ? `<video src="${map[slot]}" muted autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>` : `<img src="${map[slot]}">`}
+          <button class="grid-del" onclick="delSiteImage('${slot}', '${map[slot]}')">✕</button>
         </div>
-      </div>
-    `).join('');
-  } catch(e) { el.innerHTML = `<div class="empty-list" style="color:#fca5a5;">加载失败: ${esc(e.message)}</div>`; }
+      `;
+    } else {
+      el.innerHTML = '<div style="grid-column:1/-1; color:#555; font-size:12px;">暂无</div>';
+    }
+  });
 }
 
-window.delFeedback = async function(id) {
-  if (!confirm('确定要删除这条反馈吗？')) return;
-  try {
-    const { error } = await db.from('feedbacks').delete().eq('id', id);
-    if (error) throw error;
-    loadFeedbacks();
-  } catch(e) { alert('删除失败：' + e.message); }
-};
+async function delSiteImage(slot, url) {
+  if (!isSuper) return;
+  if (!confirm('确认删除？')) return;
+  const fileName = url.split('/').pop();
+  await db.storage.from('videos').remove([fileName]);
+  await db.from('site_images').delete().eq('slot', slot);
+  loadSiteImages();
+}
 
+function showStatus(id, type, msg) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.className = 'status ' + type;
+  el.innerText = msg;
+  if(type === 'ok') setTimeout(() => el.style.display = 'none', 3000);
+}
 function esc(s) { return !s ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escAttr(s) { return !s ? '' : String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-
-loadConfig();
 </script>
 </body>
 </html>
