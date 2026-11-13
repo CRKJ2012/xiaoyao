@@ -4,206 +4,290 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>菠萝小妖💃 · 专属 App 下载</title>
-<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
 <style>
+  /* 核心：背景色对齐 App 的深空灰 #06080e */
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html, body { height:100%; }
+  html, body { height:100%; background: #06080e; }
   body {
-    background:#06080e; color:#fff;
-    font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;
-    overflow-x:hidden; overflow-y:auto;
-    display:flex; justify-content:center; align-items:flex-start;
-    position:relative; min-height:100vh;
+    color:#f5f5f7;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+    overflow-x:hidden; position:relative; min-height:100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .bg-glow { position:fixed; inset:0; z-index:0; pointer-events:none; background: #06080e; overflow: hidden; }
-  .glow-circle { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.6; }
-  .glow-1 { width:600px; height:600px; background:rgba(168,85,247,0.3); top:-200px; left:-200px; animation: float1 10s infinite alternate; }
-  .glow-2 { width:500px; height:500px; background:rgba(236,72,153,0.25); bottom:-100px; right:-100px; animation: float2 12s infinite alternate; }
-  .glow-3 { width:400px; height:400px; background:rgba(74,122,255,0.2); top:40%; left:50%; transform:translate(-50%, -50%); animation: float3 8s infinite alternate; }
-  @keyframes float1 { to { transform: translate(50px, 50px) scale(1.1); } }
-  @keyframes float2 { to { transform: translate(-50px, -50px) scale(1.2); } }
-  @keyframes float3 { to { transform: translate(-50%, -50%) scale(1.3); opacity: 0.4; } }
+  /* 顶部导航 */
+  .top-nav {
+    position: fixed; top: 0; width: 100%; height: 48px; z-index: 9999;
+    background: rgba(6, 8, 14, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 12px; color: #86868b; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .top-nav .logo { color: #f5f5f7; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .top-nav .logo span { font-family: 'ZCOOL KuaiLe', cursive; font-size: 16px; }
 
-  .bg-text {
-    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    font-size:clamp(8rem,25vw,20rem); font-weight:900; letter-spacing:20px;
-    color:rgba(255,255,255,0.02); white-space:nowrap; pointer-events:none; z-index:1;
-    font-family:'Ma Shan Zheng', 'PingFang SC', cursive;
+  /* ================= 第一幕：滚动叙事区 ================= */
+  .scroll-container { position: relative; height: 300vh; z-index: 10; }
+
+  .sticky-viewport {
+    position: sticky; top: 0; width: 100%; height: 100vh;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
 
-  .container {
-    position:relative; z-index:10;
-    width:100%; max-width:440px; padding:40px 24px;
-    display:flex; flex-direction:column; align-items:center;
-    text-align:center;
+  /* 左右分栏 */
+  .split-layout {
+    display: flex; width: 100%; max-width: 1100px; height: 100%;
+    padding: 0 40px; align-items: center; justify-content: space-between;
+    gap: 40px;
+  }
+
+  /* 左侧文字区域 (限制宽度 45%) */
+  .text-side {
+    flex: 0 0 45%; max-width: 450px; position: relative; height: 300px;
+    overflow: hidden;
+  }
+  .text-track {
+    width: 100%;
+    /* 苹果级弹簧阻尼感 */
+    transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .text-block {
+    height: 300px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .text-block h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700; letter-spacing: -1px; line-height: 1.15;
+    color: #f5f5f7; margin-bottom: 16px;
+  }
+  .text-block p {
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
+    color: #86868b; line-height: 1.6; letter-spacing: 0.5px;
+  }
+
+  /* 右侧海报区域 (锁定比例) */
+  .image-side {
+    flex: 0 0 45%; display: flex; justify-content: center; align-items: center;
+    position: relative; height: 80vh; max-height: 750px;
+    overflow: hidden;
+  }
+  .image-track {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .poster-block {
+    width: 100%; height: 100%; /* 必须正好撑满高度 */
+    display: flex; align-items: center; justify-content: center;
+    padding: 10px 0; /* 防止上下贴边 */
+  }
+  
+  /* 修复比例：保证宽高自适应，绝不裁剪或变形 */
+  .poster-block img {
+    width: auto; height: 100%; max-width: 100%;
+    object-fit: contain;
+    border-radius: 20px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  /* 滚动提示 */
+  .scroll-hint {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; color: #86868b; letter-spacing: 2px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0.8; transition: opacity 0.4s; z-index: 20;
+  }
+  .scroll-hint::after {
+    content: ''; width: 1px; height: 30px; background: #86868b;
+    animation: dropLine 1.5s infinite;
+  }
+  @keyframes dropLine { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  /* ================= 第二幕：下载区 ================= */
+  .download-section {
+    position: relative; z-index: 20; background: #06080e; width: 100%;
+    padding: 100px 24px 80px; display: flex; flex-direction: column; align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .download-card {
+    width: 100%; max-width: 480px; background: #0c0e15; /* 稍微比背景亮一点，像悬浮的卡片 */
+    border: 1px solid rgba(255,255,255,0.06); border-radius: 28px;
+    padding: 48px 32px; text-align: center;
+    box-shadow: 0 30px 100px rgba(0,0,0,0.8);
   }
 
   .app-icon {
-    width:110px; height:110px; border-radius:26px;
-    background:linear-gradient(145deg, #1a1d2a, #0f1118);
-    border:1.5px solid rgba(160,240,255,0.2);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 40px rgba(168,85,247,0.3);
+    width:96px; height:96px; border-radius:22px; background: #1a1d26;
+    border: 1px solid rgba(255,255,255,0.08);
     display:flex; justify-content:center; align-items:center;
-    font-size:56px; color:#ff9ef0; font-weight:800;
-    margin-bottom:24px; position:relative; overflow:hidden;
+    font-size:48px; color:#fff; font-weight:800; margin: 0 auto 24px; overflow:hidden;
   }
-  .app-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 26px; }
-  .app-icon::before {
-    content:''; position:absolute; inset:0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-    border-radius:26px; pointer-events: none;
-  }
+  .app-icon img { width: 100%; height: 100%; object-fit: cover; }
 
-  .app-title {
-    font-family:'ZCOOL KuaiLe', 'Ma Shan Zheng', cursive;
-    font-size:2.2rem; letter-spacing:4px; line-height:1.2;
-    color:#e0f0ff; margin-bottom:10px;
-    text-shadow: 0 0 20px rgba(160,240,255,0.4);
-  }
+  .app-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .app-subtitle { font-size: 15px; color: #86868b; margin-bottom: 32px; }
 
   .app-desc {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(160,240,255,0.08);
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 20px;
-    font-size: 0.85rem;
-    color: #8899bb;
-    line-height: 1.8;
-    text-align: left;
-    width: 100%;
-    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 16px; padding: 20px; margin-bottom: 32px;
+    font-size: 14px; color: #a1a1a6; line-height: 1.6; text-align: left;
   }
-  .app-desc p { margin-bottom: 8px; }
+  .app-desc p { margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
   .app-desc p:last-child { margin-bottom: 0; }
-  .app-desc strong { color: #ff9ef0; font-weight: 500; }
+  .app-desc strong { color: #f5f5f7; font-weight: 500; }
 
-  .changelog-box {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(160,240,255,0.05);
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 24px;
-    width: 100%;
-    text-align: left;
-    max-height: 250px;
-    overflow-y: auto;
-  }
-  .changelog-box::-webkit-scrollbar { width: 4px; }
-  .changelog-box::-webkit-scrollbar-thumb { background: rgba(160,240,255,.2); border-radius: 2px; }
-
-  .changelog-title {
-    font-size: 0.75rem; color: #5a6a88; letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 12px; font-weight: 600;
-  }
-  .changelog-item { display: flex; gap: 10px; margin-bottom: 14px; }
-  .changelog-item:last-child { margin-bottom: 0; }
-  .cl-ver { font-size: 0.75rem; color: #a855f7; font-weight: bold; white-space: nowrap; }
-  .cl-text { font-size: 0.8rem; color: #8899bb; line-height: 1.6; }
-
-  .btn-group { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-  .download-btn, .web-btn {
-    width:100%; padding:18px 0; border:none; border-radius:50px;
-    font-size:1rem; font-weight:700; letter-spacing:2px;
-    cursor:pointer; transition: transform 0.3s, box-shadow 0.3s;
+  .btn-group { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+  .btn-primary {
+    width:100%; padding:18px 0; border:none; border-radius:16px;
+    font-size: 16px; font-weight: 600; background: #f5f5f7; color: #000;
+    cursor:pointer; transition: transform 0.2s, background 0.2s;
     text-decoration: none; display: block; text-align: center;
-    font-family:inherit;
+  }
+  .btn-primary:hover { background: #fff; transform: scale(1.02); }
+  .btn-secondary {
+    width:100%; padding:18px 0; border:none; border-radius:16px;
+    font-size: 16px; font-weight: 600; background: transparent; color: #f5f5f7;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor:pointer; transition: transform 0.2s, background 0.2s;
+    text-decoration: none; display: block; text-align: center;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.05); transform: scale(1.02); }
+  .version-tag { margin-top: 24px; font-size: 12px; color: #555; letter-spacing: 1px; }
+
+  /* 更新日志 */
+  .changelog-box {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px; padding: 24px; margin-top: 50px;
+    width: 100%; max-width: 480px; text-align: left;
+  }
+  .changelog-title { font-size: 13px; color: #86868b; letter-spacing: 2px; margin-bottom: 16px; font-weight: 600; }
+  .changelog-item { display: flex; gap: 16px; margin-bottom: 16px; }
+  .changelog-item:last-child { margin-bottom: 0; }
+  .cl-ver { font-size: 13px; color: #f5f5f7; font-weight: 600; white-space: nowrap; width: 50px; }
+  .cl-text { font-size: 13px; color: #a1a1a6; line-height: 1.6; }
+
+  /* 手机端自适应 (变成上下结构) */
+  @media (max-width: 768px) {
+    .split-layout { flex-direction: column; justify-content: center; padding: 0 20px; gap: 20px; }
+    .text-side { flex: none; height: 140px; width: 100%; text-align: center; }
+    .text-block { height: 140px; }
+    .text-block h2 { font-size: 1.8rem; }
+    .text-block p { font-size: 0.9rem; }
+    .image-side { flex: none; height: 55vh; width: 100%; max-height: none; }
+    .poster-block img { width: 100%; height: 100%; object-fit: contain; }
   }
 
-  .download-btn {
-    background:linear-gradient(135deg, #4a7aff, #a855f7, #ec4899);
-    background-size:200% auto;
-    color:#fff;
-    box-shadow: 0 15px 40px rgba(168,85,247,0.4);
-    animation: shimmer 3s linear infinite;
-  }
-  @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
-
-  .web-btn {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(160,240,255,0.2);
-    color: #9bbaff;
-  }
-  .web-btn:hover { background: rgba(160,240,255,0.1); }
-
-  .download-btn:hover, .web-btn:hover { transform:translateY(-3px); }
-  .download-btn:active, .web-btn:active { transform:translateY(0) scale(0.98); }
-
-  .version-tag { margin-top: 24px; font-size: 0.75rem; color: #5a6a88; letter-spacing: 2px; }
-
+  /* 弹窗 */
   #toast {
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(15, 19, 28, 0.95);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(160, 240, 255, 0.3);
-    color: #e0f0ff; padding: 16px 24px; border-radius: 16px;
-    font-size: 0.9rem; letter-spacing: 1px; line-height: 1.5;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.2);
-    z-index: 9999; display: none; opacity: 0; pointer-events: none;
-    text-align: center; max-width: 80vw;
+    background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(255,255,255,0.08);
+    color: #fff; padding: 14px 22px; border-radius: 14px; font-size: 13px;
+    z-index: 9999; display: none; opacity: 0; pointer-events: none; text-align: center;
   }
-
   #block-mask {
-    position: fixed; inset: 0; z-index: 10000;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    display: none; flex-direction: column; justify-content: flex-start; align-items: flex-end;
+    position: fixed; inset: 0; z-index: 10000; background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px); display: none; flex-direction: column; justify-content: flex-start; align-items: flex-end;
     padding: 20px; text-align: right;
   }
   .block-content {
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    padding: 20px; border-radius: 16px; color: #fff; max-width: 280px;
-    margin-top: 10px; backdrop-filter: blur(20px);
-    animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(30,30,30,0.95); border: 1px solid rgba(255,255,255,0.08);
+    padding: 20px; border-radius: 14px; color: #fff; max-width: 280px; margin-top: 50px;
   }
-  @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .block-content h3 { font-size: 1rem; margin-bottom: 10px; color: #ff9ef0; }
-  .block-content p { font-size: 0.85rem; line-height: 1.6; color: #d0e0ff; }
+  .block-content h3 { font-size: 14px; margin-bottom: 8px; }
+  .block-content p { font-size: 12px; line-height: 1.5; color: #a1a1a6; }
 </style>
 </head>
 <body>
 
+<!-- 顶部导航 -->
+<div class="top-nav">
+  <div class="logo"><span>妖</span> 小妖の小窝</div>
+</div>
+
 <div id="block-mask">
   <div class="block-content">
-    <h3>👇 请用浏览器打开</h3>
-    <p id="mask-text">当前环境无法下载安装包。请点击右上角菜单，选择“在浏览器中打开”后再下载。</p>
+    <h3>请用浏览器打开</h3>
+    <p id="mask-text">微信/QQ内置浏览器无法下载。请点击右上角菜单，选择“在浏览器中打开”。</p>
   </div>
 </div>
 
-<div class="bg-glow">
-  <div class="glow-circle glow-1"></div>
-  <div class="glow-circle glow-2"></div>
-  <div class="glow-circle glow-3"></div>
+<!-- ================= 第一幕：滚动叙事 ================= -->
+<div class="scroll-container" id="scrollContainer">
+  <div class="sticky-viewport">
+    <div class="split-layout">
+      
+      <!-- 左侧文字区 -->
+      <div class="text-side">
+        <div class="text-track" id="textTrack">
+          <div class="text-block">
+            <h2>随律起舞<br>自在欣赏</h2>
+            <p>沉浸式舞蹈作品库。无广告，无打扰，只为记录每一次节奏的跳动。</p>
+          </div>
+          <div class="text-block">
+            <h2>高能舞台<br>节奏随行</h2>
+            <p>竖屏高清全屏播放。手势舞、慢摇、卡点，精准捕捉每一个瞬间。</p>
+          </div>
+          <div class="text-block">
+            <h2>整理珍藏<br>静赏舞姿</h2>
+            <p>独家图集功能。高清大图任意缩放，把迷人的定格画面悄悄收藏。</p>
+          </div>
+          <div class="text-block">
+            <h2>以舞成长<br>持续发光</h2>
+            <p>和 40W+ 粉丝一起，见证小妖的每一次蜕变。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧海报区 -->
+      <div class="image-side">
+        <div class="image-track" id="imageTrack">
+          <div class="poster-block"><img src="poster1.jpg" alt=""></div>
+          <div class="poster-block"><img src="poster2.jpg" alt=""></div>
+          <div class="poster-block"><img src="poster3.jpg" alt=""></div>
+          <div class="poster-block"><img src="poster4.jpg" alt=""></div>
+        </div>
+      </div>
+
+    </div>
+    
+    <!-- 滑动提示 -->
+    <div class="scroll-hint" id="scrollHint">SCROLL</div>
+  </div>
 </div>
-<div class="bg-text">菠萝小妖</div>
 
-<div class="container">
+<!-- ================= 第二幕：下载区 ================= -->
+<div class="download-section">
+  
+  <div class="download-card">
+    <div class="app-icon" id="appIcon">
+      <img src="icon.jpg" alt="App Icon" onerror="this.style.display='none'; document.getElementById('appIconText').style.display='block';">
+      <span id="appIconText" style="display:none;">妖</span>
+    </div>
 
-  <div class="app-icon" id="appIcon">
-    <img src="icon.jpg" alt="App Icon" onerror="this.style.display='none'; document.getElementById('appIconText').style.display='block';">
-    <span id="appIconText" style="display:none;">妖</span>
+    <h1 class="app-title">小妖的小窝</h1>
+    <div class="app-subtitle">专属舞蹈作品集</div>
+
+    <div class="app-desc">
+      <p><span>✨</span> <span><strong>纯净无广告</strong> — 只有作品，没有打扰。</span></p>
+      <p><span>🎬</span> <span><strong>丝滑体验</strong> — 全屏沉浸，秒开不卡顿。</span></p>
+      <p><span>💖</span> <span><strong>独家互动</strong> — 全站点赞、小妖图集，和同好一起打 Call。</span></p>
+    </div>
+
+    <div class="btn-group">
+      <a href="app.apk" download="小妖的小窝.apk" class="btn-primary" id="downloadBtn">下载安卓 App</a>
+      <a href="https://crkj2012.github.io/xiaoyao/index23" class="btn-secondary" target="_blank">访问网页版 (iOS/PC)</a>
+    </div>
+
+    <div class="version-tag">最新版本 · Android</div>
   </div>
 
-  <h1 class="app-title">小妖的小窝</h1>
-
-  <div class="app-desc">
-    <p>✨ <strong>纯净无广告</strong>：专属菠萝小妖💃的舞蹈作品集。</p>
-    <p>🎬 <strong>丝滑体验</strong>：卡点、手势舞、慢摇，全屏沉浸式播放，视频秒开不卡顿。</p>
-    <p>💖 <strong>独家互动</strong>：支持全站点赞、小妖图集，和喜欢小妖的朋友一起为她打 call。</p>
-    <p>📱 <strong>专属定制</strong>：专为手机端优化的 App 体验，比网页版更流畅！</p>
-    <p style="color:#fca5a5; font-size:0.8rem; margin-top:10px;">⚠️ 注意：苹果 iOS 系统无法直接安装此安装包，请点击下方按钮访问网页版。</p>
-  </div>
-
+  <!-- 更新日志 -->
   <div class="changelog-box">
     <div class="changelog-title">全套更新日志</div>
     <div class="changelog-item">
-      <div class="cl-ver">v1.0.6</div>
-      <div class="cl-text">作品墙支持置顶排序；图集补充照片描述；新增全部图集页，主页精选六张；首页信息精简，作品数据更新为 200+；优化弱网加载体验。</div>
-    </div>
-    <div class="changelog-item">
-      <div class="cl-ver">v1.0.5</div>
+      <div class="cl-ver">最新</div>
       <div class="cl-text">新增小妖图集功能（支持点击放大）；新增全站公告弹窗；支持系统物理返回键；修复视频返回后仍在播放的问题；优化了首页排版与动画。</div>
     </div>
     <div class="changelog-item">
@@ -228,32 +312,65 @@
     </div>
   </div>
 
-  <div class="btn-group">
-    <a href="app.apk" download="小妖的小窝_v1.0.6.apk" class="download-btn" id="downloadBtn">
-      安卓用户下载 App
-    </a>
-    <a href="https://crkj2012.github.io/xiaoyao/index23" class="web-btn" target="_blank">
-      苹果/电脑用户访问网页版
-    </a>
-  </div>
-
-  <div class="version-tag">Version 1.0.6 · Android</div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-  window.addEventListener('DOMContentLoaded', () => {
-    anime.timeline({ easing: 'easeOutExpo' })
-      .add({ targets: '.app-icon', scale: [0.5, 1], opacity: [0, 1], rotate: [-10, 0], duration: 1200, delay: 200 })
-      .add({ targets: '.app-title', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=800')
-      .add({ targets: '.app-desc', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=600')
-      .add({ targets: '.changelog-box', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=600')
-      .add({ targets: '.btn-group', translateY: [30, 0], scale: [0.9, 1], opacity: [0, 1], duration: 1000, easing: 'easeOutElastic(1, .5)' }, '-=500')
-      .add({ targets: '.version-tag', opacity: [0, 1], duration: 800 }, '-=500');
+  const scrollContainer = document.getElementById('scrollContainer');
+  const textTrack = document.getElementById('textTrack');
+  const imageTrack = document.getElementById('imageTrack');
+  const scrollHint = document.getElementById('scrollHint');
+  
+  const totalItems = 4;
+  let currentIndex = 0;
+
+  function updateScrollStory() {
+    const scrollTop = window.scrollY;
+    const containerTop = scrollContainer.offsetTop;
+    const scrollableDistance = scrollContainer.offsetHeight - window.innerHeight;
+    
+    let progress = (scrollTop - containerTop) / scrollableDistance;
+    progress = Math.max(0, Math.min(1, progress));
+
+    scrollHint.style.opacity = progress > 0.02 ? '0' : '0.8';
+
+    // 关键分页逻辑：把 300vh 等分成 4 页
+    let index = Math.floor(progress * totalItems);
+    if (index >= totalItems) index = totalItems - 1;
+
+    if (index !== currentIndex) {
+      currentIndex = index;
+      
+      // 左边文字向上滑动（高度根据设备自适应）
+      const textBlockHeight = window.innerWidth <= 768 ? 140 : 300;
+      textTrack.style.transform = `translateY(-${currentIndex * textBlockHeight}px)`;
+      
+      // 右边图片向上翻页
+      imageTrack.style.transform = `translateY(-${currentIndex * 100}%)`;
+    }
+  }
+
+  // 绑定滚动，使用 RAF 极致优化
+  let isTicking = false;
+  window.addEventListener('scroll', () => {
+    if (!isTicking) {
+      window.requestAnimationFrame(() => {
+        updateScrollStory();
+        isTicking = false;
+      });
+      isTicking = true;
+    }
   });
 
-  // 环境检测：QQ 内置浏览器用 " QQ/" 特征判断，避免误排除 QQ 浏览器
+  window.addEventListener('resize', () => {
+    currentIndex = -1;
+    updateScrollStory();
+  });
+
+  window.addEventListener('DOMContentLoaded', updateScrollStory);
+
+  // 下载拦截逻辑
   const ua = navigator.userAgent.toLowerCase();
   const isWeixin = ua.indexOf('micromessenger') !== -1;
   const isQQ = / qq\//.test(ua) || (ua.indexOf('qq') !== -1 && ua.indexOf('mqqbrowser') === -1 && ua.indexOf('qqbrowser') === -1);
@@ -273,7 +390,7 @@
     if (!isMobile) {
       e.preventDefault();
       blockMask.style.display = 'flex';
-      maskText.innerText = '您正在电脑端访问。安装包仅支持 Android 手机下载，请使用手机扫码或输入网址在手机浏览器中打开。';
+      maskText.innerText = '您正在电脑端访问。请使用安卓手机扫码或输入网址在手机浏览器中打开。';
       return;
     }
     if (isWeixin || isQQ) {
@@ -284,23 +401,18 @@
     showToast('开始下载，请到通知栏查看...');
   });
 
-  blockMask.addEventListener('click', () => {
-    blockMask.style.display = 'none';
-  });
+  blockMask.addEventListener('click', () => { blockMask.style.display = 'none'; });
 
   function showToast(text) {
     toast.innerText = text;
     toast.style.display = 'block';
-    anime({
-      targets: toast, opacity: [0, 1], translateY: ['-30%', '-50%'], scale: [0.9, 1],
-      duration: 400, easing: 'easeOutCubic'
-    });
+    toast.style.transition = 'opacity 0.3s, transform 0.3s';
+    toast.style.opacity = '1';
+    toast.style.transform = 'translate(-50%, -50%) scale(1)';
     setTimeout(() => {
-      anime({
-        targets: toast, opacity: 0, translateY: '-70%', scale: 0.9,
-        duration: 300, easing: 'easeInCubic',
-        complete: () => { toast.style.display = 'none'; }
-      });
+      toast.style.opacity = '0';
+      toast.style.transform = 'translate(-50%, -50%) scale(0.95)';
+      setTimeout(() => { toast.style.display = 'none'; }, 300);
     }, 2500);
   }
 </script>
