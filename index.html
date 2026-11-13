@@ -57,7 +57,7 @@
   /* 主容器 */
   .container {
     position:relative; z-index:10;
-    width:100%; max-width:420px; padding:40px 24px;
+    width:100%; max-width:440px; padding:40px 24px;
     display:flex; flex-direction:column; align-items:center;
     text-align:center;
   }
@@ -113,15 +113,20 @@
     border: 1px solid rgba(160,240,255,0.05);
     border-radius: 16px;
     padding: 18px;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
     width: 100%;
     text-align: left;
+    max-height: 250px;
+    overflow-y: auto;
   }
+  .changelog-box::-webkit-scrollbar { width: 4px; }
+  .changelog-box::-webkit-scrollbar-thumb { background: rgba(160,240,255,.2); border-radius: 2px; }
+  
   .changelog-title {
     font-size: 0.75rem; color: #5a6a88; letter-spacing: 2px; text-transform: uppercase;
     margin-bottom: 12px; font-weight: 600;
   }
-  .changelog-item { display: flex; gap: 10px; margin-bottom: 12px; }
+  .changelog-item { display: flex; gap: 10px; margin-bottom: 14px; }
   .changelog-item:last-child { margin-bottom: 0; }
   .cl-ver {
     font-size: 0.75rem; color: #a855f7; font-weight: bold; white-space: nowrap;
@@ -130,26 +135,39 @@
     font-size: 0.8rem; color: #8899bb; line-height: 1.6;
   }
 
-  /* 下载按钮 */
+  /* 按钮通用 */
+  .btn-group { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+  .download-btn, .web-btn {
+    width:100%; padding:18px 0; border:none; border-radius:50px;
+    font-size:1rem; font-weight:700; letter-spacing:2px;
+    cursor:pointer; transition: transform 0.3s, box-shadow 0.3s;
+    text-decoration: none; display: block; text-align: center;
+    font-family:inherit;
+  }
+  
+  /* 安卓下载按钮 */
   .download-btn {
-    width:100%; padding:20px 0; border:none; border-radius:50px;
     background:linear-gradient(135deg, #4a7aff, #a855f7, #ec4899);
     background-size:200% auto;
-    color:#fff; font-size:1.1rem; font-weight:700; letter-spacing:4px;
-    cursor:pointer; box-shadow: 0 15px 40px rgba(168,85,247,0.4);
-    transition: transform 0.3s, box-shadow 0.3s;
+    color:#fff;
+    box-shadow: 0 15px 40px rgba(168,85,247,0.4);
     animation: shimmer 3s linear infinite;
-    position:relative; overflow:hidden;
-    font-family:inherit;
-    text-decoration: none;
-    display: block; text-align: center;
   }
-  .download-btn:hover { transform:translateY(-4px); box-shadow: 0 25px 60px rgba(168,85,247,0.6); }
-  .download-btn:active { transform:translateY(0) scale(0.98); }
   @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
 
+  /* 苹果网页版按钮 */
+  .web-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(160,240,255,0.2);
+    color: #9bbaff;
+  }
+  .web-btn:hover { background: rgba(160,240,255,0.1); }
+
+  .download-btn:hover, .web-btn:hover { transform:translateY(-3px); }
+  .download-btn:active, .web-btn:active { transform:translateY(0) scale(0.98); }
+
   .version-tag {
-    margin-top: 20px; font-size: 0.75rem; color: #5a6a88; letter-spacing: 2px;
+    margin-top: 24px; font-size: 0.75rem; color: #5a6a88; letter-spacing: 2px;
   }
 
   /* 提示 Toast */
@@ -189,7 +207,7 @@
 </head>
 <body>
 
-<!-- 拦截提示层（默认隐藏） -->
+<!-- 拦截提示层 -->
 <div id="block-mask">
   <div class="block-content">
     <h3>👇 请用浏览器打开</h3>
@@ -208,7 +226,7 @@
 <!-- 主内容 -->
 <div class="container">
   
-  <!-- App 图标（如果你有图，替换 icon.jpg） -->
+  <!-- App 图标 -->
   <div class="app-icon" id="appIcon">
     <img src="icon.jpg" alt="App Icon" onerror="this.style.display='none'; document.getElementById('appIconText').style.display='block';">
     <span id="appIconText" style="display:none;">妖</span>
@@ -222,25 +240,49 @@
     <p>🎬 <strong>丝滑体验</strong>：卡点、手势舞、慢摇，全屏沉浸式播放，视频秒开不卡顿。</p>
     <p>💖 <strong>独家互动</strong>：支持全站点赞、小妖图集，和喜欢小妖的朋友一起为她打 call。</p>
     <p>📱 <strong>专属定制</strong>：专为手机端优化的 App 体验，比网页版更流畅！</p>
+    <p style="color:#fca5a5; font-size:0.8rem; margin-top:10px;">⚠️ 注意：苹果 iOS 系统无法直接安装此安装包，请点击下方按钮访问网页版。</p>
   </div>
 
   <!-- 更新日志 -->
   <div class="changelog-box">
-    <div class="changelog-title">更新日志</div>
+    <div class="changelog-title">全套更新日志</div>
     <div class="changelog-item">
       <div class="cl-ver">v1.0.5</div>
-      <div class="cl-text">新增小妖图集功能；新增全站公告弹窗；修复视频返回后仍在播放的问题；优化了首页布局。</div>
+      <div class="cl-text">新增小妖图集功能（支持点击放大）；新增全站公告弹窗；支持系统物理返回键；修复视频返回后仍在播放的问题；优化了首页排版与动画。</div>
     </div>
     <div class="changelog-item">
       <div class="cl-ver">v1.0.4</div>
-      <div class="cl-text">新增点赞功能；增加全站加载动画；优化首页和作品墙竖屏展示。</div>
+      <div class="cl-text">新增顶部点赞功能；增加全站加载动画（支持图片/视频）；优化首页背景读取；强制 5 秒加载逻辑。</div>
+    </div>
+    <div class="changelog-item">
+      <div class="cl-ver">v1.0.3</div>
+      <div class="cl-text">新增哔哩哔哩官方跳转入口；页面切换和元素入场动画升级，更加丝滑流畅；修复部分手机标题无法显示的兼容性问题。</div>
+    </div>
+    <div class="changelog-item">
+      <div class="cl-ver">v1.0.2</div>
+      <div class="cl-text">作品展示全面改为竖屏滑动；重构页面路由；修复外链跳转返回后直接回到桌面的问题。</div>
+    </div>
+    <div class="changelog-item">
+      <div class="cl-ver">v1.0.1</div>
+      <div class="cl-text">新增反馈功能；新增关于她/学舞经历页面。</div>
+    </div>
+    <div class="changelog-item">
+      <div class="cl-ver">v1.0.0</div>
+      <div class="cl-text">初代版本上线，包含首页、作品墙、关注页及基础的丝滑动画。</div>
     </div>
   </div>
 
-  <!-- 下载按钮 (指向 app.apk) -->
-  <a href="app.apk" download="小妖的小窝_v1.0.5.apk" class="download-btn" id="downloadBtn">
-    立即下载 App
-  </a>
+  <div class="btn-group">
+    <!-- 安卓下载按钮 (指向 app.apk) -->
+    <a href="app.apk" download="小妖的小窝_v1.0.5.apk" class="download-btn" id="downloadBtn">
+      安卓用户下载 App
+    </a>
+
+    <!-- 网页版跳转 -->
+    <a href="https://crkj2012.github.io/xiaoyao/index23" class="web-btn" target="_blank">
+      苹果/电脑用户访问网页版
+    </a>
+  </div>
   
   <div class="version-tag">Version 1.0.5 · Android</div>
 </div>
@@ -256,7 +298,7 @@
       .add({ targets: '.app-title', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=800')
       .add({ targets: '.app-desc', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=600')
       .add({ targets: '.changelog-box', translateY: [20, 0], opacity: [0, 1], duration: 800 }, '-=600')
-      .add({ targets: '.download-btn', translateY: [30, 0], scale: [0.9, 1], opacity: [0, 1], duration: 1000, easing: 'easeOutElastic(1, .5)' }, '-=500')
+      .add({ targets: '.btn-group', translateY: [30, 0], scale: [0.9, 1], opacity: [0, 1], duration: 1000, easing: 'easeOutElastic(1, .5)' }, '-=500')
       .add({ targets: '.version-tag', opacity: [0, 1], duration: 800 }, '-=500');
   });
 
@@ -294,7 +336,7 @@
       return;
     }
 
-    // 如果是正常的手机浏览器，放行下载，并弹出提示
+    // 正常的手机浏览器，放行下载，并弹出提示
     showToast('开始下载，请到通知栏查看...');
   });
 
