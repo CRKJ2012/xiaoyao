@@ -12,7 +12,7 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { height:100%; }
   body { background:#06080e; color:#fff; font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif; overflow-x:hidden; }
-  
+
   /* 全站加载层 */
   #global-loader { position: fixed; inset: 0; z-index: 99999; background: #06080e; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
   .loader-content { display: flex; flex-direction: column; align-items: center; gap: 20px; }
@@ -62,7 +62,6 @@
   .w-name { font-size:clamp(2.8rem,11vw,5rem); font-weight:800; letter-spacing:8px; line-height:1.1; background:linear-gradient(135deg,#e0f0ff 0%,#ff9ef0 50%,#a0f0ff 100%); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:shimmer 5s linear infinite; }
   @keyframes shimmer { 0% { background-position:0% center; } 100% { background-position:200% center; } }
   .w-sig { margin-top:24px; font-size:1.1rem; color:#8899bb; letter-spacing:3px; font-weight:300; line-height:1.9; }
-  .w-loc { display:inline-flex; align-items:center; gap:8px; margin-top:28px; padding:10px 26px; border-radius:40px; font-size:.82rem; color:#9bbaff; letter-spacing:2px; background:rgba(160,240,255,.06); border:1px solid rgba(160,240,255,.15); }
   .enter-btn { margin-top:60px; padding:20px 68px; border:none; border-radius:50px; background:linear-gradient(135deg,#4a7aff,#a855f7,#ec4899); color:#fff; font-size:1.05rem; font-weight:600; letter-spacing:4px; cursor:pointer; box-shadow:0 14px 45px rgba(168,85,247,.4); transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s; font-family:inherit; will-change:transform; }
   .enter-btn:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 22px 60px rgba(168,85,247,.55); }
   .enter-btn:active { transform:scale(.96); }
@@ -76,7 +75,7 @@
   @media (max-width:600px) { .home-nav .nav-links { gap:16px; } }
   .home-nav .nav-links a { font-size:.8rem; color:#6a7a99; text-decoration:none; letter-spacing:2px; cursor:pointer; transition:color .25s; }
   .home-nav .nav-links a:hover { color:#d0e0ff; }
-  
+
   .hero-home { max-width:1200px; margin:0 auto; width:100%; padding:80px 40px 60px; text-align:center; position:relative; }
   @media (max-width:768px) { .hero-home { padding:50px 20px 40px; } }
   .hero-home .hero-content { position:relative; z-index:2; }
@@ -90,7 +89,8 @@
   .btn-primary:hover { transform:translateY(-3px) scale(1.03); box-shadow:0 18px 55px rgba(168,85,247,.55); }
   .btn-ghost { background:transparent; color:#9bbaff; border:1px solid rgba(160,240,255,.25); }
   .btn-ghost:hover { background:rgba(160,240,255,.08); transform:translateY(-3px); }
-  
+
+  /* 重新设计的统计条：去掉"单条时长""主攻风格"，保留粉丝/作品/点赞 */
   .stats-band { max-width:1200px; margin:0 auto; width:100%; padding:50px 40px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:40px; border-top:1px solid rgba(255,255,255,.05); border-bottom:1px solid rgba(255,255,255,.05); position:relative; z-index:1; }
   @media (max-width:768px) { .stats-band { padding:40px 20px; gap:30px; } }
   .stat-cell { text-align:center; flex:1; min-width:120px; }
@@ -109,9 +109,10 @@
   @media (max-width:768px) { .home-gallery { padding:40px 20px 0; } }
   .home-gallery .sec-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
   .home-gallery-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
-  .home-gallery-item { aspect-ratio:1/1; border-radius:12px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.05); }
+  .home-gallery-item { aspect-ratio:1/1; border-radius:12px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.05); position:relative; }
   .home-gallery-item img { width:100%; height:100%; object-fit:cover; transition:transform .4s; }
   .home-gallery-item:hover img { transform:scale(1.08); }
+  .home-gallery-item .hg-caption { position:absolute; left:0; right:0; bottom:0; padding:22px 10px 8px; background:linear-gradient(180deg,transparent,rgba(6,8,14,.9)); font-size:.72rem; color:#e0f0ff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
 
   .preview-section { max-width:1200px; margin:0 auto; width:100%; padding:80px 40px 40px; position:relative; z-index:1; }
   @media (max-width:768px) { .preview-section { padding:60px 20px 30px; } }
@@ -123,6 +124,7 @@
   .v-portrait-card video { width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1; }
   .v-portrait-card .v-overlay { position:absolute; bottom:0; left:0; right:0; padding:30px 10px 10px; background:linear-gradient(180deg, transparent, rgba(6,8,14,0.9)); z-index:2; pointer-events:none; }
   .v-portrait-card .v-title { font-size:0.8rem; color:#fff; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .v-portrait-card .v-top-badge { position:absolute; top:8px; left:8px; z-index:2; font-size:.62rem; color:#ffd76a; background:rgba(212,175,55,.15); border:1px solid rgba(212,175,55,.5); padding:3px 8px; border-radius:20px; letter-spacing:1px; }
 
   .about-band { max-width:1200px; margin:0 auto; width:100%; padding:80px 40px; display:grid; grid-template-columns:1fr 1fr; gap:70px; position:relative; z-index:1; }
   @media (max-width:768px) { .about-band { grid-template-columns:1fr; gap:40px; padding:60px 20px; } }
@@ -135,7 +137,7 @@
   .style-card .sc-num { font-size:.7rem; color:#5a6a88; letter-spacing:3px; }
   .style-card .sc-title { margin-top:10px; font-size:1.05rem; color:#d0e0ff; font-weight:600; letter-spacing:1px; }
   .style-card .sc-desc { margin-top:10px; font-size:.82rem; color:#6a7a99; line-height:1.9; }
-  
+
   .home-footer { max-width:1200px; margin:0 auto; width:100%; padding:60px 40px 40px; text-align:center; border-top:1px solid rgba(255,255,255,.05); position:relative; z-index:1; }
   .home-footer .hf-name { font-size:1.2rem; font-weight:700; letter-spacing:5px; color:#e0f0ff; }
   .home-footer .hf-sig { margin-top:12px; font-size:.78rem; color:#4a5a7a; letter-spacing:3px; }
@@ -147,7 +149,7 @@
   .works-list { max-width:1200px; margin:40px auto 0; width:100%; padding:0 40px; display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; position:relative; z-index:1; }
   @media (min-width:768px) { .works-list { grid-template-columns:repeat(3, 1fr); gap:16px; } }
   @media (max-width:768px) { .works-list { padding:0 20px; gap:12px; } }
-  
+
   .empty { text-align:center; padding:80px 24px; color:#3a4a66; font-size:.9rem; background:rgba(255,255,255,.02); border:1px dashed rgba(255,255,255,.08); border-radius:24px; grid-column:1/-1; }
   .empty .icon { font-size:3.4rem; opacity:.4; margin-bottom:16px; }
   .loading-row { text-align:center; padding:60px 24px; color:#5a6a88; font-size:.85rem; grid-column:1/-1; }
@@ -155,6 +157,16 @@
   #page-detail { background:#06080e; }
   .detail-video-wrap { width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000; }
   .detail-video-wrap video { width:100%; height:100%; object-fit:contain; }
+
+  /* 新增：全部图集页 */
+  #page-gallery { padding-bottom:80px; position:relative; }
+  .gallery-grid-full { max-width:1200px; margin:40px auto 0; width:100%; padding:0 40px; display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; position:relative; z-index:1; }
+  @media (min-width:768px) { .gallery-grid-full { grid-template-columns:repeat(3, 1fr); gap:16px; } }
+  @media (max-width:768px) { .gallery-grid-full { padding:0 20px; } }
+  .gallery-full-item { aspect-ratio:1/1; border-radius:12px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.05); position:relative; background:#0a0d14; }
+  .gallery-full-item img { width:100%; height:100%; object-fit:cover; transition:transform .4s; }
+  .gallery-full-item:hover img { transform:scale(1.06); }
+  .gallery-full-item .gf-caption { position:absolute; left:0; right:0; bottom:0; padding:26px 12px 10px; background:linear-gradient(180deg,transparent,rgba(6,8,14,.92)); font-size:.75rem; color:#e0f0ff; line-height:1.5; max-height:40%; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
 
   #page-about { padding-bottom:80px; position:relative; }
   .about-page-body { max-width:900px; margin:40px auto 0; width:100%; padding:0 40px; position:relative; z-index:1; }
@@ -210,7 +222,7 @@
   .site-block .sb-label { font-size:.7rem; color:#5a6a88; letter-spacing:4px; text-transform:uppercase; margin-bottom:14px; }
   .site-block .sb-text { font-size:.95rem; color:#8899bb; line-height:2.2; letter-spacing:.5px; }
   .site-block .sb-text strong { color:#d0e0ff; font-weight:500; }
-  
+
   .feedback-form { margin-top:20px; background:rgba(255,255,255,.02); border:1px solid rgba(160,240,255,.1); border-radius:16px; padding:20px; }
   .feedback-input { width:100%; background:#141824; border:1px solid #232a3d; border-radius:10px; padding:14px; color:#fff; font-size:.9rem; outline:none; margin-bottom:12px; font-family:inherit; resize:none; }
   .feedback-input:focus { border-color:#4a7aff; }
@@ -248,18 +260,23 @@
   .notice-text { font-size: 0.95rem; color: #c0d0ee; line-height: 1.8; white-space: pre-wrap; max-height: 40vh; overflow-y: auto; margin-bottom: 24px; }
   .notice-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, #ff9ef0, #a855f7); color: #fff; font-size: 0.95rem; font-weight: 600; letter-spacing: 2px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 10px 30px rgba(255, 158, 240, 0.3); }
 
-  /* 图集大图预览层 */
+  /* 图集大图预览层（加描述） */
   #image-preview {
     position: fixed; inset: 0; z-index: 10002;
     background: rgba(0, 0, 0, 0.95);
-    display: none; align-items: center; justify-content: center;
-    opacity: 0; backdrop-filter: blur(5px);
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; backdrop-filter: blur(5px); padding: 20px; gap: 16px;
   }
   #image-preview img {
-    max-width: 100%; max-height: 100%;
+    max-width: 100%; max-height: calc(100% - 80px);
     object-fit: contain;
-    transition: transform 0.3s;
+    transition: transform 0.3s; border-radius: 8px;
   }
+  #image-preview .ip-caption {
+    font-size: .9rem; color: #d0e0ff; letter-spacing: 1px; text-align: center;
+    max-width: 90%; line-height: 1.6; display: none;
+  }
+  #image-preview .ip-caption.show { display: block; }
 </style>
 </head>
 <body>
@@ -282,16 +299,18 @@
 <!-- 图集大图预览 -->
 <div id="image-preview">
   <img id="preview-img" src="">
+  <div class="ip-caption" id="preview-caption"></div>
 </div>
 
 <div id="changelog-modal">
   <div class="modal-content" id="modal-content">
-    <h2 class="modal-title">✨ 更新日志 v1.0.5</h2>
+    <h2 class="modal-title">✨ 更新日志 v1.0.6</h2>
     <div class="modal-body">
-      <p>· 新增了 <strong>反馈功能</strong>（在“关于本站”页）</p>
-      <p>· 重构了页面路由，支持系统的<strong>物理返回键</strong></p>
-      <p>· 首页视觉大升级，作品全面改为<strong>竖屏展示</strong></p>
-      <p>· 新增 <strong>小妖图集</strong>，支持点击放大</p>
+      <p>· 作品墙支持<strong>置顶排序</strong>，后台置顶即刻生效</p>
+      <p>· 图集补充<strong>照片描述</strong>，主页与全量页均可查看</p>
+      <p>· 新增<strong>全部图集</strong>页，主页精选六张</p>
+      <p>· 首页信息精简，作品数据更新为 <strong>200+</strong></p>
+      <p>· 优化加载兜底，弱网下也能按时进站</p>
     </div>
     <button class="modal-btn" id="close-modal">开启小窝</button>
   </div>
@@ -312,7 +331,6 @@
     <div class="avatar-big" id="wAvatar"><span>妖</span></div>
     <h1 class="w-name" id="wName">菠萝小妖💃</h1>
     <p class="w-sig" id="wSig">帅是常态，甜是彩蛋，随机切换</p>
-    <div class="w-loc" id="wLoc">📍 陕西 · 宝鸡</div>
     <button class="enter-btn" id="enterBtn">进入小窝</button>
   </div>
 </div>
@@ -331,7 +349,7 @@
       <a data-nav="site">本站</a>
     </div>
   </div>
-  
+
   <div class="hero-home">
     <div class="page-hero-bg" id="homeHeroBg"></div>
     <div class="hero-content">
@@ -349,13 +367,13 @@
       </div>
     </div>
   </div>
-  
+
+  <!-- 重新设计的统计条：去掉"单条时长""主攻风格" -->
   <div class="stats-band">
     <div class="stat-cell"><div class="num">40W+</div><div class="lbl">粉丝</div></div>
-    <div class="stat-cell"><div class="num">100+</div><div class="lbl">作品</div></div>
-    <div class="stat-cell"><div class="num">10-20s</div><div class="lbl">单条时长</div></div>
-    <div class="stat-cell"><div class="num">卡点</div><div class="lbl">主攻风格</div></div>
-    
+    <div class="stat-cell"><div class="num">200+</div><div class="lbl">作品</div></div>
+    <div class="stat-cell"><div class="num">卡点</div><div class="lbl">风格标签</div></div>
+
     <div class="like-cell" id="likeBtn">
       <div class="like-btn" id="likeIcon">
         <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -365,14 +383,15 @@
     </div>
   </div>
 
-  <!-- 图集 -->
+  <!-- 图集：主页只显示六张 -->
   <div class="home-gallery">
     <div class="sec-head">
       <div><div class="sec-label">Gallery</div><div class="sec-title">小妖图集</div></div>
+      <button class="btn-ghost" id="viewAllGallery" style="padding:10px 26px; font-size:.78rem;">查看全部 →</button>
     </div>
     <div class="home-gallery-grid" id="homeGalleryGrid"></div>
   </div>
-  
+
   <div class="preview-section">
     <div class="sec-head">
       <div><div class="sec-label">Selected</div><div class="sec-title">精选作品</div></div>
@@ -394,7 +413,7 @@
       </div>
     </div>
     <div class="style-cards">
-      <div class="style-card"><div class="sc-num">01</div><div class="sc-title">酷帅 · 灵动</div><div class="sc-desc">清爽短发，兼顾帅气与灵动，穿搭偏休闲工装、潮牌、棒球帽。</div></div>
+      <div class="style-card"><div class="sc-num">01</div><div class="sc-title">酷帅 · 灵动</div><div class="sc-desc">清爽短发，兼顾帅气与灵动，穿搭偏休闲潮流、棒球帽。</div></div>
       <div class="style-card"><div class="sc-num">02</div><div class="sc-title">短平快 · 强卡点</div><div class="sc-desc">大多10-20秒，适配热门DJ、电子BGM，节奏利落。</div></div>
       <div class="style-card"><div class="sc-num">03</div><div class="sc-title">互动 · 翻牌点舞</div><div class="sc-desc">粉丝经常点舞，她会翻牌跳大家点名的舞蹈，与小伙伴合拍。</div></div>
     </div>
@@ -420,6 +439,22 @@
   </div>
   <div class="works-list" id="worksList">
     <div class="loading-row" id="worksLoading">正在加载...</div>
+  </div>
+</div>
+
+<!-- 新增：全部图集页 -->
+<div class="page" id="page-gallery">
+  <div class="top-bar">
+    <div class="nav-btn" id="galleryBack">←</div>
+    <div class="home-btn" onclick="goHome()">首页</div>
+    <div class="tb-title">小妖图集</div>
+  </div>
+  <div class="page-hero-bg" id="galleryHeroBg"></div>
+  <div class="section" style="padding-top:50px; text-align:center;">
+    <div class="sec-label">Gallery</div><div class="sec-title">全部图集</div><div class="sec-desc">镜头里的每一面</div>
+  </div>
+  <div class="gallery-grid-full" id="galleryFullGrid">
+    <div class="loading-row" id="galleryLoading">正在加载...</div>
   </div>
 </div>
 
@@ -454,7 +489,7 @@
     </div>
     <div class="about-block">
       <div class="ab-label">Style</div>
-      <div class="ab-text">清爽短发，风格偏酷帅灵动。视频节奏短平快（大多10-20秒），强卡点，适配热门DJ、电子BGM。穿搭偏休闲工装、潮牌、棒球帽、墨镜等潮流搭配。</div>
+      <div class="ab-text">清爽短发，风格偏酷帅灵动。视频节奏短平快（大多10-20秒），强卡点，适配热门DJ、电子BGM。穿搭偏休闲潮流、棒球帽、墨镜等潮流搭配。</div>
     </div>
     <div class="about-block">
       <div class="ab-label">Interaction</div>
@@ -508,7 +543,7 @@
     <div class="section" style="padding:50px 0 0; text-align:center;">
       <div class="sec-label">Follow</div><div class="sec-title">关注小妖</div><div class="sec-desc">在以下平台找到她</div>
     </div>
-    
+
     <div class="contact-cards">
       <div class="contact-card" onclick="openLink('https://v.douyin.com/HFpSorli27k/')">
         <div class="cc-icon">🎵</div>
@@ -536,7 +571,7 @@
         <div class="cc-desc">点击跳转关注她</div>
       </div>
     </div>
-    
+
     <div class="site-note">
       <strong>说明：</strong>本页面为粉丝向作品展示站，所有视频版权归原作者所有。视频展示需获得本人授权，请勿用于商业用途。
     </div>
@@ -554,7 +589,7 @@
     <div class="site-block"><div class="sb-label">Why</div><div class="sb-text">做这个站，是因为喜欢她的舞蹈，也想有一个干净、专注的地方，把她的作品按顺序整理起来，方便随时回看。</div></div>
     <div class="site-block"><div class="sb-label">Copyright</div><div class="sb-text">所有视频、图片、文字内容的版权均归<strong>原作者（菠萝小妖）</strong>所有。本站不拥有这些内容的版权，仅作展示。如需使用，请联系本人获得授权。</div></div>
     <div class="site-block"><div class="sb-label">Tech</div><div class="sb-text">前端：纯 HTML + CSS + JavaScript + Anime.js 动画库。<br>存储：Supabase Storage + Database。<br>托管：GitHub Pages。</div></div>
-    
+
     <div class="site-block" style="margin-top:50px;">
       <div class="sb-label">Feedback</div>
       <div class="sb-text" style="margin-bottom:16px;">如果你有任何建议，或者发现 bug，欢迎留言告诉我们。</div>
@@ -569,7 +604,17 @@
       <div class="sb-label">更新日志</div>
       <div class="changelog-block">
         <div class="changelog-item">
-          <div class="changelog-ver">v1.0.5 <span>最新</span></div>
+          <div class="changelog-ver">v1.0.6 <span>最新</span></div>
+          <div class="changelog-text">
+            · 作品墙支持置顶排序，后台置顶即刻生效<br>
+            · 图集新增照片描述，主页与全量页同步展示<br>
+            · 新增全部图集页，主页精选六张<br>
+            · 首页信息精简，作品数据更新为 200+<br>
+            · 优化加载兜底，弱网下也能按时进站
+          </div>
+        </div>
+        <div class="changelog-item">
+          <div class="changelog-ver">v1.0.5</div>
           <div class="changelog-text">
             · 新增反馈功能，可提交建议<br>
             · 支持系统物理返回键<br>
@@ -601,20 +646,19 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentPage = 'welcome';
 let pageStack = ['welcome'];
 
-// 1. 修复物理返回键
+// 物理返回键
 window.addEventListener('popstate', (e) => {
   if (pageStack.length > 1) {
     pageStack.pop();
     const prevPage = pageStack[pageStack.length - 1];
     renderPage(prevPage, 'backward');
   } else {
-    if (window.plus) { window.plus.runtime.quit(); } 
+    if (window.plus) { window.plus.runtime.quit(); }
     else { history.pushState(null, null, location.href); showToast('已经在首页啦'); }
   }
 });
 history.pushState({ page: 'welcome' }, '', '');
 
-// 监听 App 环境的返回键
 document.addEventListener('plusready', function() {
   var webview = plus.webview.currentWebview();
   plus.key.addEventListener('backbutton', function() {
@@ -645,7 +689,7 @@ function goHome() {
 function renderPage(toId, direction) {
   const toEl = document.getElementById('page-' + toId);
   if (!toEl) return;
-  
+
   document.querySelectorAll('video').forEach(v => v.pause());
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -667,24 +711,24 @@ function renderPage(toId, direction) {
     }
   }
 
-  anime.set(toEl, { opacity: 0.4, translateY: direction === 'forward' ? 30 : -30 });
-  anime({ targets: toEl, opacity: 1, translateY: 0, duration: 400, easing: 'easeOutCubic' });
+  // 动画起步用 0.7 而非 0.4，避免引擎卡住时页面半透明不可读
+  anime.set(toEl, { opacity: 0.7, translateY: direction === 'forward' ? 24 : -24 });
+  anime({ targets: toEl, opacity: 1, translateY: 0, duration: 380, easing: 'easeOutCubic' });
   currentPage = toId;
 
   if (toId === 'home') ensureHomeLoaded();
   if (toId === 'works') ensureWorksLoaded();
+  if (toId === 'gallery') ensureGalleryLoaded();
 }
 
 document.querySelectorAll('[data-nav]').forEach(el => {
   el.addEventListener('click', (e) => navigateTo(e.currentTarget.dataset.nav));
 });
 
-document.getElementById('worksBack').addEventListener('click', goBack);
-document.getElementById('contactBack').addEventListener('click', goBack);
-document.getElementById('aboutBack').addEventListener('click', goBack);
-document.getElementById('danceBack').addEventListener('click', goBack);
-document.getElementById('siteBack').addEventListener('click', goBack);
-document.getElementById('detailBack').addEventListener('click', goBack);
+['worksBack','contactBack','aboutBack','danceBack','siteBack','detailBack','galleryBack'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', goBack);
+});
 
 document.getElementById('enterBtn').addEventListener('click', () => {
   navigateTo('home');
@@ -696,9 +740,12 @@ document.getElementById('goWorks').addEventListener('click', () => {
 document.getElementById('goAbout').addEventListener('click', () => {
   navigateTo('about');
 });
+document.getElementById('viewAllGallery').addEventListener('click', () => {
+  navigateTo('gallery');
+});
 
 function openLink(url) {
-  if (window.plus) { window.plus.runtime.openURL(url); } 
+  if (window.plus) { window.plus.runtime.openURL(url); }
   else { window.open(url, '_blank'); }
 }
 
@@ -727,15 +774,22 @@ document.getElementById('fbSubmit').addEventListener('click', async () => {
   } catch (e) { showToast('提交失败'); } finally { btn.disabled = false; btn.innerText = '提交反馈'; }
 });
 
-const CURRENT_VERSION = 'v1.0.5';
+const CURRENT_VERSION = 'v1.0.6';
 const loadStartTime = Date.now();
 
+// 带超时的 Promise 包装，防止单个请求卡死拖垮加载层
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(() => resolve(null), ms))
+  ]);
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
-  // 首页丝滑入场动画
   anime.timeline({ easing: 'easeOutExpo' })
     .add({ targets: '.avatar-big', scale: [0.6, 1], opacity: [0, 1], duration: 900, easing: 'easeOutElastic(1, .6)' })
     .add({ targets: '.w-name', opacity: [0, 1], translateY: [30, 0], duration: 800, delay: 200, easing: 'easeOutCubic' })
-    .add({ targets: '.w-sig, .w-loc', opacity: [0, 1], translateY: [20, 0], duration: 700, delay: anime.stagger(120, { start: 400 }), easing: 'easeOutCubic' })
+    .add({ targets: '.w-sig', opacity: [0, 1], translateY: [20, 0], duration: 700, delay: 400, easing: 'easeOutCubic' })
     .add({ targets: '.enter-btn', opacity: [0, 1], translateY: [30, 0], scale: [0.9, 1], duration: 800, delay: 700, easing: 'easeOutElastic(1, .5)' });
 
   const ogContainer = document.getElementById('og-container');
@@ -751,7 +805,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  await Promise.all([loadSiteImages(), loadLikeCount(), loadNotice(), loadHomeGallery()]);
+  // 每个请求加 4s 超时兜底
+  await Promise.all([
+    withTimeout(loadSiteImages(), 4000),
+    withTimeout(loadLikeCount(), 4000),
+    withTimeout(loadNotice(), 4000),
+    withTimeout(loadHomeGallery(), 4000)
+  ]);
   const elapsedTime = Date.now() - loadStartTime;
   const remainingTime = Math.max(0, 5000 - elapsedTime);
 
@@ -759,9 +819,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     const loader = document.getElementById('global-loader');
     loader.style.opacity = '0';
     setTimeout(() => { loader.style.display = 'none'; }, 800);
-    
-    checkChangelog(); 
-    showNotice();     
+
+    checkChangelog();
+    showNotice();
   }, remainingTime);
 });
 
@@ -793,7 +853,7 @@ function showNotice() {
   const modal = document.getElementById('notice-modal');
   const content = document.getElementById('notice-content');
   document.getElementById('notice-text').innerText = noticeTextCached;
-  
+
   setTimeout(() => {
     modal.style.display = 'flex';
     anime({ targets: content, opacity: [0, 1], scale: [0.9, 1], duration: 600, easing: 'easeOutElastic(1, .7)' });
@@ -804,37 +864,72 @@ function showNotice() {
   });
 }
 
-// 加载首页图集，支持点击放大
+// 图集：主页只显示六张 + 显示描述
 async function loadHomeGallery() {
   try {
     const { data, error } = await db.from('gallery').select('*').order('created_at', { ascending: false }).limit(6);
     if (error) throw error;
     const grid = document.getElementById('homeGalleryGrid');
     if (!data || data.length === 0) { grid.innerHTML = ''; return; }
-    
+
     grid.innerHTML = data.map(g => `
-      <div class="home-gallery-item" onclick="previewImage('${g.url}')">
-        <img src="${g.url}">
+      <div class="home-gallery-item" onclick="previewImage('${escapeAttr(g.url)}', '${escapeAttr(g.title || '')}')">
+        <img src="${escapeHtml(g.url)}" alt="">
+        ${g.title ? `<div class="hg-caption">${escapeHtml(g.title)}</div>` : ''}
       </div>
     `).join('');
   } catch(e) {}
 }
 
-// 放大预览逻辑
+// 全部图集页
+let galleryLoaded = false;
+async function ensureGalleryLoaded() {
+  if (galleryLoaded) return;
+  galleryLoaded = true;
+  const grid = document.getElementById('galleryFullGrid');
+  try {
+    const { data, error } = await db.from('gallery').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">🖼️</div><p>还没有图集</p></div>`;
+      return;
+    }
+    grid.innerHTML = data.map(g => `
+      <div class="gallery-full-item" onclick="previewImage('${escapeAttr(g.url)}', '${escapeAttr(g.title || '')}')">
+        <img src="${escapeHtml(g.url)}" alt="">
+        ${g.title ? `<div class="gf-caption">${escapeHtml(g.title)}</div>` : ''}
+      </div>
+    `).join('');
+  } catch(e) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">⚠️</div><p>加载失败</p></div>`;
+  }
+}
+
+// 放大预览 + 描述
 const previewModal = document.getElementById('image-preview');
 const previewImg = document.getElementById('preview-img');
+const previewCaption = document.getElementById('preview-caption');
 
-function previewImage(url) {
+function previewImage(url, title) {
   previewImg.src = url;
+  if (title && title.trim()) {
+    previewCaption.textContent = title;
+    previewCaption.classList.add('show');
+  } else {
+    previewCaption.textContent = '';
+    previewCaption.classList.remove('show');
+  }
   previewModal.style.display = 'flex';
   anime({ targets: previewModal, opacity: [0, 1], duration: 300, easing: 'easeOutCubic' });
-  anime({ targets: previewImg, scale: [0.8, 1], duration: 400, easing: 'easeOutCubic' });
+  anime({ targets: previewImg, scale: [0.85, 1], duration: 400, easing: 'easeOutCubic' });
 }
 
 previewModal.addEventListener('click', () => {
   anime({ targets: previewModal, opacity: 0, duration: 300, easing: 'easeInCubic', complete: () => {
     previewModal.style.display = 'none';
-    previewImg.src = '';
+    previewImg.removeAttribute('src');
+    previewCaption.textContent = '';
+    previewCaption.classList.remove('show');
   }});
 });
 
@@ -858,11 +953,21 @@ document.getElementById('likeBtn').addEventListener('click', async () => {
 if (hasLiked) document.getElementById('likeIcon').classList.add('liked');
 
 let homeLoaded = false, worksLoaded = false, allVideosCache = null;
+
+// 前端补 is_top 排序：置顶优先，其次按时间
+function sortVideos(data) {
+  return [...data].sort((a, b) => {
+    if (a.is_top && !b.is_top) return -1;
+    if (!a.is_top && b.is_top) return 1;
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+}
+
 async function fetchVideos() {
   if (allVideosCache) return allVideosCache;
-  const { data, error } = await db.from('videos').select('*').order('created_at', { ascending: false });
+  const { data, error } = await db.from('videos').select('*');
   if (error) throw error;
-  allVideosCache = data || [];
+  allVideosCache = sortVideos(data || []);
   return allVideosCache;
 }
 
@@ -873,9 +978,10 @@ async function ensureHomeLoaded() {
   try {
     const data = await fetchVideos();
     if (!data.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">🎬</div><p>还没有作品</p></div>`; return; }
-    const preview = data.slice(0, 4); 
+    const preview = data.slice(0, 4);
     grid.innerHTML = preview.map(v => `
       <div class="v-portrait-card" onclick="openDetail('${escapeAttr(v.url)}', '${escapeAttr(v.title || '未命名视频')}')">
+        ${v.is_top ? '<div class="v-top-badge">置顶</div>' : ''}
         <div class="skeleton" style="width:100%;height:100%;">
           <video playsinline preload="metadata" muted src="${escapeHtml(v.url)}" onloadeddata="this.parentElement.classList.remove('skeleton')"></video>
         </div>
@@ -894,6 +1000,7 @@ async function ensureWorksLoaded() {
     if (!data.length) { listEl.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">🎬</div><p>还没有作品</p></div>`; return; }
     listEl.innerHTML = data.map(v => `
       <div class="v-portrait-card" onclick="openDetail('${escapeAttr(v.url)}', '${escapeAttr(v.title || '未命名视频')}')">
+        ${v.is_top ? '<div class="v-top-badge">置顶</div>' : ''}
         <div class="skeleton" style="width:100%;height:100%;">
           <video playsinline preload="metadata" muted src="${escapeHtml(v.url)}" onloadeddata="this.parentElement.classList.remove('skeleton')"></video>
         </div>
@@ -937,8 +1044,8 @@ async function loadSiteImages() {
       document.getElementById('themeImgBg').style.backgroundImage = '';
       document.getElementById('themeBg').style.opacity = '1';
     }
-    
-    const heroMap = { home: 'homeHeroBg', works: 'worksHeroBg', about: 'aboutHeroBg', dance: 'danceHeroBg', contact: 'contactHeroBg' };
+
+    const heroMap = { home: 'homeHeroBg', works: 'worksHeroBg', about: 'aboutHeroBg', dance: 'danceHeroBg', contact: 'contactHeroBg', gallery: 'galleryHeroBg' };
     Object.keys(heroMap).forEach(key => {
       const slot = key + '_bg';
       const el = document.getElementById(heroMap[key]);
@@ -947,7 +1054,7 @@ async function loadSiteImages() {
         else { el.style.backgroundImage = ''; el.classList.remove('show'); }
       }
     });
-    
+
     const wAvatar = document.getElementById('wAvatar');
     const dotLogo = document.getElementById('homeDotLogo');
     if (map.avatar) {
@@ -960,7 +1067,7 @@ async function loadSiteImages() {
   } catch (e) { console.warn(e); }
 }
 
-function escapeHtml(s) { return !s ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeHtml(s) { return !s ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function escapeAttr(s) { return !s ? '' : String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 </script>
 </body>

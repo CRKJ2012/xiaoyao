@@ -17,36 +17,15 @@
     position:relative; min-height:100vh;
   }
 
-  /* 极光背景流光 */
-  .bg-glow {
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    background: #06080e;
-    overflow: hidden;
-  }
-  .glow-circle {
-    position:absolute; border-radius:50%;
-    filter:blur(100px); opacity:0.6;
-  }
-  .glow-1 {
-    width:600px; height:600px; background:rgba(168,85,247,0.3);
-    top:-200px; left:-200px;
-    animation: float1 10s infinite alternate;
-  }
-  .glow-2 {
-    width:500px; height:500px; background:rgba(236,72,153,0.25);
-    bottom:-100px; right:-100px;
-    animation: float2 12s infinite alternate;
-  }
-  .glow-3 {
-    width:400px; height:400px; background:rgba(74,122,255,0.2);
-    top:40%; left:50%; transform:translate(-50%, -50%);
-    animation: float3 8s infinite alternate;
-  }
+  .bg-glow { position:fixed; inset:0; z-index:0; pointer-events:none; background: #06080e; overflow: hidden; }
+  .glow-circle { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.6; }
+  .glow-1 { width:600px; height:600px; background:rgba(168,85,247,0.3); top:-200px; left:-200px; animation: float1 10s infinite alternate; }
+  .glow-2 { width:500px; height:500px; background:rgba(236,72,153,0.25); bottom:-100px; right:-100px; animation: float2 12s infinite alternate; }
+  .glow-3 { width:400px; height:400px; background:rgba(74,122,255,0.2); top:40%; left:50%; transform:translate(-50%, -50%); animation: float3 8s infinite alternate; }
   @keyframes float1 { to { transform: translate(50px, 50px) scale(1.1); } }
   @keyframes float2 { to { transform: translate(-50px, -50px) scale(1.2); } }
   @keyframes float3 { to { transform: translate(-50%, -50%) scale(1.3); opacity: 0.4; } }
 
-  /* 背景巨大文字 */
   .bg-text {
     position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
     font-size:clamp(8rem,25vw,20rem); font-weight:900; letter-spacing:20px;
@@ -54,7 +33,6 @@
     font-family:'Ma Shan Zheng', 'PingFang SC', cursive;
   }
 
-  /* 主容器 */
   .container {
     position:relative; z-index:10;
     width:100%; max-width:440px; padding:40px 24px;
@@ -62,7 +40,6 @@
     text-align:center;
   }
 
-  /* App 图标 */
   .app-icon {
     width:110px; height:110px; border-radius:26px;
     background:linear-gradient(145deg, #1a1d2a, #0f1118);
@@ -72,24 +49,20 @@
     font-size:56px; color:#ff9ef0; font-weight:800;
     margin-bottom:24px; position:relative; overflow:hidden;
   }
-  .app-icon img {
-    width: 100%; height: 100%; object-fit: cover; border-radius: 26px;
-  }
+  .app-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 26px; }
   .app-icon::before {
     content:''; position:absolute; inset:0;
     background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
     border-radius:26px; pointer-events: none;
   }
 
-  /* 文字描述 */
   .app-title {
     font-family:'ZCOOL KuaiLe', 'Ma Shan Zheng', cursive;
     font-size:2.2rem; letter-spacing:4px; line-height:1.2;
     color:#e0f0ff; margin-bottom:10px;
     text-shadow: 0 0 20px rgba(160,240,255,0.4);
   }
-  
-  /* App 简介区 */
+
   .app-desc {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(160,240,255,0.08);
@@ -107,7 +80,6 @@
   .app-desc p:last-child { margin-bottom: 0; }
   .app-desc strong { color: #ff9ef0; font-weight: 500; }
 
-  /* 更新日志区 */
   .changelog-box {
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(160,240,255,0.05);
@@ -121,21 +93,16 @@
   }
   .changelog-box::-webkit-scrollbar { width: 4px; }
   .changelog-box::-webkit-scrollbar-thumb { background: rgba(160,240,255,.2); border-radius: 2px; }
-  
+
   .changelog-title {
     font-size: 0.75rem; color: #5a6a88; letter-spacing: 2px; text-transform: uppercase;
     margin-bottom: 12px; font-weight: 600;
   }
   .changelog-item { display: flex; gap: 10px; margin-bottom: 14px; }
   .changelog-item:last-child { margin-bottom: 0; }
-  .cl-ver {
-    font-size: 0.75rem; color: #a855f7; font-weight: bold; white-space: nowrap;
-  }
-  .cl-text {
-    font-size: 0.8rem; color: #8899bb; line-height: 1.6;
-  }
+  .cl-ver { font-size: 0.75rem; color: #a855f7; font-weight: bold; white-space: nowrap; }
+  .cl-text { font-size: 0.8rem; color: #8899bb; line-height: 1.6; }
 
-  /* 按钮通用 */
   .btn-group { width: 100%; display: flex; flex-direction: column; gap: 12px; }
   .download-btn, .web-btn {
     width:100%; padding:18px 0; border:none; border-radius:50px;
@@ -144,8 +111,7 @@
     text-decoration: none; display: block; text-align: center;
     font-family:inherit;
   }
-  
-  /* 安卓下载按钮 */
+
   .download-btn {
     background:linear-gradient(135deg, #4a7aff, #a855f7, #ec4899);
     background-size:200% auto;
@@ -155,7 +121,6 @@
   }
   @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
 
-  /* 苹果网页版按钮 */
   .web-btn {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(160,240,255,0.2);
@@ -166,11 +131,8 @@
   .download-btn:hover, .web-btn:hover { transform:translateY(-3px); }
   .download-btn:active, .web-btn:active { transform:translateY(0) scale(0.98); }
 
-  .version-tag {
-    margin-top: 24px; font-size: 0.75rem; color: #5a6a88; letter-spacing: 2px;
-  }
+  .version-tag { margin-top: 24px; font-size: 0.75rem; color: #5a6a88; letter-spacing: 2px; }
 
-  /* 提示 Toast */
   #toast {
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
     background: rgba(15, 19, 28, 0.95);
@@ -183,7 +145,6 @@
     text-align: center; max-width: 80vw;
   }
 
-  /* 微信/电脑 浏览器拦截遮罩 */
   #block-mask {
     position: fixed; inset: 0; z-index: 10000;
     background: rgba(0, 0, 0, 0.85);
@@ -197,17 +158,13 @@
     margin-top: 10px; backdrop-filter: blur(20px);
     animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  @keyframes slideIn {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
+  @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .block-content h3 { font-size: 1rem; margin-bottom: 10px; color: #ff9ef0; }
   .block-content p { font-size: 0.85rem; line-height: 1.6; color: #d0e0ff; }
 </style>
 </head>
 <body>
 
-<!-- 拦截提示层 -->
 <div id="block-mask">
   <div class="block-content">
     <h3>👇 请用浏览器打开</h3>
@@ -215,7 +172,6 @@
   </div>
 </div>
 
-<!-- 背景层 -->
 <div class="bg-glow">
   <div class="glow-circle glow-1"></div>
   <div class="glow-circle glow-2"></div>
@@ -223,18 +179,15 @@
 </div>
 <div class="bg-text">菠萝小妖</div>
 
-<!-- 主内容 -->
 <div class="container">
-  
-  <!-- App 图标 -->
+
   <div class="app-icon" id="appIcon">
     <img src="icon.jpg" alt="App Icon" onerror="this.style.display='none'; document.getElementById('appIconText').style.display='block';">
     <span id="appIconText" style="display:none;">妖</span>
   </div>
-  
+
   <h1 class="app-title">小妖的小窝</h1>
-  
-  <!-- App 简介 -->
+
   <div class="app-desc">
     <p>✨ <strong>纯净无广告</strong>：专属菠萝小妖💃的舞蹈作品集。</p>
     <p>🎬 <strong>丝滑体验</strong>：卡点、手势舞、慢摇，全屏沉浸式播放，视频秒开不卡顿。</p>
@@ -243,9 +196,12 @@
     <p style="color:#fca5a5; font-size:0.8rem; margin-top:10px;">⚠️ 注意：苹果 iOS 系统无法直接安装此安装包，请点击下方按钮访问网页版。</p>
   </div>
 
-  <!-- 更新日志 -->
   <div class="changelog-box">
     <div class="changelog-title">全套更新日志</div>
+    <div class="changelog-item">
+      <div class="cl-ver">v1.0.6</div>
+      <div class="cl-text">作品墙支持置顶排序；图集补充照片描述；新增全部图集页，主页精选六张；首页信息精简，作品数据更新为 200+；优化弱网加载体验。</div>
+    </div>
     <div class="changelog-item">
       <div class="cl-ver">v1.0.5</div>
       <div class="cl-text">新增小妖图集功能（支持点击放大）；新增全站公告弹窗；支持系统物理返回键；修复视频返回后仍在播放的问题；优化了首页排版与动画。</div>
@@ -273,25 +229,20 @@
   </div>
 
   <div class="btn-group">
-    <!-- 安卓下载按钮 (指向 app.apk) -->
-    <a href="app.apk" download="小妖的小窝_v1.0.5.apk" class="download-btn" id="downloadBtn">
+    <a href="app.apk" download="小妖的小窝_v1.0.6.apk" class="download-btn" id="downloadBtn">
       安卓用户下载 App
     </a>
-
-    <!-- 网页版跳转 -->
     <a href="https://crkj2012.github.io/xiaoyao/index23" class="web-btn" target="_blank">
       苹果/电脑用户访问网页版
     </a>
   </div>
-  
-  <div class="version-tag">Version 1.0.5 · Android</div>
+
+  <div class="version-tag">Version 1.0.6 · Android</div>
 </div>
 
-<!-- 提示框 -->
 <div id="toast"></div>
 
 <script>
-  // 初始化入场动画
   window.addEventListener('DOMContentLoaded', () => {
     anime.timeline({ easing: 'easeOutExpo' })
       .add({ targets: '.app-icon', scale: [0.5, 1], opacity: [0, 1], rotate: [-10, 0], duration: 1200, delay: 200 })
@@ -302,50 +253,41 @@
       .add({ targets: '.version-tag', opacity: [0, 1], duration: 800 }, '-=500');
   });
 
-  // 环境检测
+  // 环境检测：QQ 内置浏览器用 " QQ/" 特征判断，避免误排除 QQ 浏览器
   const ua = navigator.userAgent.toLowerCase();
   const isWeixin = ua.indexOf('micromessenger') !== -1;
-  const isQQ = ua.indexOf('qq') !== -1 && ua.indexOf('mqqbrowser') === -1; // 排除QQ浏览器
+  const isQQ = / qq\//.test(ua) || (ua.indexOf('qq') !== -1 && ua.indexOf('mqqbrowser') === -1 && ua.indexOf('qqbrowser') === -1);
   const isMobile = /iphone|ipad|ipod|android|blackberry|windows phone|webos/i.test(ua);
-  
+
   const blockMask = document.getElementById('block-mask');
   const maskText = document.getElementById('mask-text');
   const downloadBtn = document.getElementById('downloadBtn');
   const toast = document.getElementById('toast');
 
-  // 1. 如果在微信或QQ内，直接显示右上角提示遮罩
   if (isWeixin || isQQ) {
     blockMask.style.display = 'flex';
     maskText.innerText = '微信/QQ内置浏览器无法直接下载安装包。请点击右上角“...”菜单，选择“在浏览器中打开”后再点击下载。';
   }
-  
-  // 2. 点击下载的逻辑
+
   downloadBtn.addEventListener('click', (e) => {
-    // 如果在电脑端，拦截并提示
     if (!isMobile) {
       e.preventDefault();
       blockMask.style.display = 'flex';
       maskText.innerText = '您正在电脑端访问。安装包仅支持 Android 手机下载，请使用手机扫码或输入网址在手机浏览器中打开。';
       return;
     }
-
-    // 如果在微信/QQ 内点击，再次提醒
     if (isWeixin || isQQ) {
       e.preventDefault();
       blockMask.style.display = 'flex';
       return;
     }
-
-    // 正常的手机浏览器，放行下载，并弹出提示
     showToast('开始下载，请到通知栏查看...');
   });
 
-  // 点击遮罩关闭
   blockMask.addEventListener('click', () => {
     blockMask.style.display = 'none';
   });
 
-  // 显示提示框
   function showToast(text) {
     toast.innerText = text;
     toast.style.display = 'block';
